@@ -6,46 +6,40 @@
 <title>United Ticket Share 26/27</title>
 <style>
   :root{
-    --court:#C8621E;        /* hardwood-warmed orange, from a basketball */
-    --court-deep:#9A4711;
-    --ink:#141B2E;          /* United navy-black */
-    --ink-soft:#33405C;
-    --paint:#0E3B6B;        /* the painted key blue */
-    --line:#E7E1D6;         /* court line cream */
-    --paper:#FBF8F2;
-    --card:#FFFFFF;
-    --a:#C8621E; --b:#2E7D5B; --c:#7A5CB0;   /* three family hues */
-    --a-soft:#F7E7DA; --b-soft:#DFF0E7; --c-soft:#ECE3F6;
-    --good:#2E7D5B; --warn:#C8621E; --muted:#8A8578;
+    --court:#C8621E; --court-deep:#9A4711;
+    --ink:#141B2E; --ink-soft:#33405C;
+    --line:#E7E1D6; --paper:#FBF8F2; --card:#FFFFFF;
+    --a:#C8621E; --b:#2E7D5B; --c:#7A5CB0; --all:#0E3B6B;
+    --a-soft:#F7E7DA; --b-soft:#DFF0E7; --c-soft:#ECE3F6; --all-soft:#DCE6F2;
+    --good:#2E7D5B; --muted:#8A8578;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    background:var(--paper); color:var(--ink);
-    -webkit-font-smoothing:antialiased; line-height:1.5;
-  }
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5}
   .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
 
-  /* ---- Hero: a scoreboard ---- */
-  header.board{
-    background:
-      linear-gradient(180deg,var(--ink) 0%,#0C1424 100%);
-    color:#fff; border-radius:0 0 20px 20px;
-    padding:34px 28px 30px; position:relative; overflow:hidden;
-    margin-bottom:26px;
-  }
+  header.board{background:linear-gradient(180deg,var(--ink) 0%,#0C1424 100%);color:#fff;
+    border-radius:0 0 20px 20px;padding:30px 28px 26px;position:relative;overflow:hidden;margin-bottom:24px}
   header.board::after{content:"";position:absolute;inset:0;
     background:radial-gradient(circle at 88% -10%,rgba(200,98,30,.35),transparent 45%);pointer-events:none}
-  .board .kick{font-size:.72rem;letter-spacing:.22em;color:#B8C0D4;font-weight:600}
-  .board h1{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:800;line-height:1.05;margin:8px 0 4px}
-  .board .season{color:var(--court);font-weight:800}
-  .board p.sub{color:#AEB6CA;font-size:.9rem;max-width:52ch}
-  .tabs{display:flex;gap:6px;margin-top:22px;flex-wrap:wrap}
-  .tab{background:rgba(255,255,255,.08);color:#DfE3EC;border:none;padding:9px 16px;border-radius:10px;
-    font-size:.86rem;font-weight:600;cursor:pointer;transition:.15s}
+  .kick{font-size:.72rem;letter-spacing:.22em;color:#B8C0D4;font-weight:600}
+  h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;line-height:1.05;margin:8px 0 4px}
+  .season{color:var(--court);font-weight:800}
+  .sub{color:#AEB6CA;font-size:.88rem;max-width:56ch}
+  .whobar{display:flex;align-items:center;gap:9px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:2}
+  .whobar span{font-size:.78rem;color:#AEB6CA}
+  .whobar button{background:rgba(255,255,255,.1);color:#E3E7F0;border:1px solid rgba(255,255,255,.18);
+    padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;cursor:pointer}
+  .whobar button.me{background:#fff;color:var(--ink);border-color:#fff}
+  .tabs{display:flex;gap:6px;margin-top:16px;flex-wrap:wrap;position:relative;z-index:2}
+  .tab{background:rgba(255,255,255,.08);color:#DfE3EC;border:none;padding:9px 15px;border-radius:10px;
+    font-size:.85rem;font-weight:600;cursor:pointer;transition:.15s}
   .tab:hover{background:rgba(255,255,255,.16)}
   .tab.on{background:var(--court);color:#fff}
-  .syncpill{margin-top:14px;font-size:.74rem;color:#AEB6CA;min-height:1.1em}
+  .badge{background:#E4453A;color:#fff;border-radius:20px;font-size:.68rem;font-weight:800;
+    padding:1px 7px;margin-left:6px;display:none}
+  .badge.show{display:inline-block}
+  .syncpill{margin-top:13px;font-size:.73rem;color:#AEB6CA;min-height:1.1em;position:relative;z-index:2}
   .syncpill b{color:#fff}
 
   section{display:none;animation:fade .25s ease}
@@ -53,75 +47,84 @@
   @keyframes fade{from{opacity:0}to{opacity:1}}
   @media (prefers-reduced-motion:reduce){section{animation:none}}
 
-  h2.sec{font-size:1.05rem;font-weight:800;margin:6px 0 14px;display:flex;align-items:center;gap:10px}
+  h2.sec{font-size:1.05rem;font-weight:800;margin:6px 0 12px;display:flex;align-items:center;gap:10px}
   h2.sec::before{content:"";width:5px;height:20px;background:var(--court);border-radius:3px}
+  .note{color:var(--muted);font-size:.79rem}
 
-  /* ---- Fairness bars ---- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;
+    border:1px solid var(--line);font-size:.87rem}
+  th{background:var(--ink);color:#fff;text-align:left;padding:11px 12px;font-weight:600;font-size:.77rem}
+  td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:middle}
+  tr.shared td{background:var(--all-soft)}
+  select.assign{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;
+    font-size:.82rem;font-weight:700;cursor:pointer;background:#fff}
+  .chip{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.73rem;font-weight:700}
+  .chipGreg{background:var(--a-soft);color:var(--a)}
+  .chipBenoit{background:var(--b-soft);color:#1f6045}
+  .chipSam{background:var(--c-soft);color:var(--c)}
+  .chipEveryone{background:var(--all-soft);color:var(--all)}
+  .statustag{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .st-held{background:#EFEFEA;color:var(--muted)}
+  .st-offered{background:#FDE7C7;color:#8a5a10}
+  .time{color:var(--court);font-weight:800}
+  .schooltag{font-size:.66rem;font-weight:800;background:#FDE7C7;color:#8a5a10;
+    padding:2px 7px;border-radius:20px;margin-left:5px;white-space:nowrap}
+  .biggame{font-size:.66rem;font-weight:800;background:#F7D9CC;color:#9A3B12;
+    padding:2px 7px;border-radius:20px;margin-left:5px;white-space:nowrap}
+
+  button.act{background:var(--court);color:#fff;border:none;border-radius:10px;padding:9px 16px;
+    font-weight:700;cursor:pointer;font-size:.84rem}
+  button.act:hover{background:var(--court-deep)}
+  button.ghost{background:none;border:1px solid var(--line);color:var(--ink-soft);border-radius:8px;
+    padding:6px 11px;cursor:pointer;font-size:.78rem;font-weight:600}
+  button.ghost:hover{border-color:var(--court);color:var(--court)}
+  button.tiny{font-size:.72rem;padding:4px 9px}
+
   .fair{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:10px}
   .fcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
   .fcard .fam{font-weight:800;font-size:.95rem;margin-bottom:2px}
-  .fcard .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle}
-  .fcard .big{font-size:2rem;font-weight:800;line-height:1}
-  .fcard .lil{font-size:.75rem;color:var(--muted);margin-top:2px}
-  .tierbar{display:flex;height:8px;border-radius:6px;overflow:hidden;margin-top:12px;background:var(--line)}
-  .tierbar i{display:block}
-  .legend{display:flex;gap:14px;font-size:.72rem;color:var(--muted);margin-top:8px;flex-wrap:wrap}
-  .legend b{color:var(--ink)}
-  .balance{font-size:.82rem;padding:10px 14px;border-radius:10px;margin-bottom:20px;font-weight:600}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle}
+  .big{font-size:2rem;font-weight:800;line-height:1}
+  .lil{font-size:.74rem;color:var(--muted);margin-top:4px}
+  .balance{font-size:.82rem;padding:10px 14px;border-radius:10px;margin-bottom:18px;font-weight:600}
   .balance.ok{background:var(--b-soft);color:#1c5a3f}
   .balance.off{background:#FBE7DA;color:#8a3d0f}
+  .sharedbox{background:var(--all-soft);border:1px solid #C2D2E5;border-radius:14px;padding:15px 18px;margin-bottom:16px}
+  .sharedbox b{color:var(--all)}
 
-  /* ---- Schedule table ---- */
-  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;
-    border:1px solid var(--line);font-size:.88rem}
-  th{background:var(--ink);color:#fff;text-align:left;padding:11px 12px;font-weight:600;font-size:.78rem}
-  td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:middle}
-  tr:hover td{background:#FCFAF6}
-  .tierpill{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:6px;
-    font-weight:800;font-size:.75rem}
-  .tA{background:#F7D9CC;color:#9A3B12}.tB{background:#FBEFC9;color:#8a6d10}.tC{background:#E3EAF2;color:#3f5876}
-  .note{color:var(--muted);font-size:.78rem}
-  select.assign,select.tiersel{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;font-size:.82rem;
-    font-weight:700;cursor:pointer;background:#fff}
-  select.tiersel{width:52px}
-  .edit{outline:none;border-bottom:1px dashed transparent;cursor:text}
-  .edit:hover,.edit:focus{border-bottom-color:var(--court)}
-  /* draft */
-  .dgame{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  .dgame,.ogame{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
     border-radius:12px;padding:11px 14px;margin-bottom:8px}
   .dgame.taken{opacity:.55;background:#FAFAF7}
-  .dgame .g-meta{flex:1;min-width:0}
-  .dgame .g-opp{font-weight:700;font-size:.9rem}
-  .dgame .g-sub{font-size:.76rem;color:var(--muted)}
-  .dpick{display:flex;gap:6px}
-  .dpick button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 11px;font-weight:700;
-    font-size:.8rem;cursor:pointer;transition:.12s}
+  .dgame.shared{background:var(--all-soft);border-color:#C2D2E5;opacity:1}
+  .ogame{border-left:4px solid var(--court)}
+  .g-meta{flex:1;min-width:0}
+  .g-opp{font-weight:700;font-size:.9rem}
+  .g-sub{font-size:.75rem;color:var(--muted)}
+  .dpick{display:flex;gap:6px;flex-wrap:wrap}
+  .dpick button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 11px;
+    font-weight:700;font-size:.79rem;cursor:pointer}
   .dpick button:hover{border-color:var(--court)}
   .dpick button.pk{color:#fff;border-color:transparent}
-  .dtot{text-align:center}
-  .dtot .n{font-size:1.15rem;font-weight:800;line-height:1}
+  .dpick button.allbtn{border-style:dashed;color:var(--all)}
+  .dtot{text-align:center}.dtot .n{font-size:1.15rem;font-weight:800;line-height:1}
   .dtot .l{font-size:.68rem;color:var(--muted)}
-  .chip{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.74rem;font-weight:700}
-  .chipA{background:var(--a-soft);color:var(--a)}.chipB{background:var(--b-soft);color:#1f6045}.chipC{background:var(--c-soft);color:var(--c)}
+  .poolbar{margin-top:13px;padding-top:12px;border-top:1px solid var(--line);font-size:.78rem;color:var(--ink-soft)}
+  .poolbar b{color:var(--ink)}
 
-  /* ---- Sales form ---- */
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
   .row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}
   .field{display:flex;flex-direction:column;gap:5px}
-  .field label{font-size:.74rem;font-weight:700;color:var(--ink-soft)}
-  .field input,.field select{border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:inherit;font-size:.86rem;background:#fff}
-  .field.sm input{width:80px}
-  button.act{background:var(--court);color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:700;
-    cursor:pointer;font-size:.86rem}
-  button.act:hover{background:var(--court-deep)}
-  button.ghost{background:none;border:1px solid var(--line);color:var(--ink-soft);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.78rem;font-weight:600}
+  .field label{font-size:.73rem;font-weight:700;color:var(--ink-soft)}
+  .field input,.field select{border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:inherit;
+    font-size:.85rem;background:#fff}
+  .field.sm input{width:78px}
   .settle{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .scard{border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
-  .scard .net{font-size:1.7rem;font-weight:800;margin:6px 0}
-  .scard .verdict{font-size:.78rem;font-weight:700}
+  .scard{border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;background:var(--card)}
+  .scard .net{font-size:1.6rem;font-weight:800;margin:6px 0}
   .owed{color:var(--good)}.owes{color:var(--court)}.even{color:var(--muted)}
   .empty{color:var(--muted);font-size:.85rem;text-align:center;padding:22px}
   .savenote{font-size:.72rem;color:var(--muted);text-align:right;margin-top:8px;min-height:1em}
+  .log{font-size:.78rem;color:var(--muted);border-left:2px solid var(--line);padding:4px 0 4px 12px;margin-bottom:5px}
   @media(max-width:720px){.fair,.settle{grid-template-columns:1fr}.hidesm{display:none}}
 </style>
 </head>
@@ -130,9 +133,16 @@
   <div class="wrap" style="padding:0">
     <div class="kick">MELBOURNE UNITED · JOHN CAIN ARENA</div>
     <h1>Shared Season Tickets <span class="season">26/27</span></h1>
-    <p class="sub">Sixteen home games at John Cain Arena, four seats, three families. Each game belongs to one family for the night — swap, sell, or all go together. Everything below saves for everyone.</p>
+    <p class="sub">Sixteen home games, four seats, three families. One night is all of us together; the other fifteen split five each.</p>
+    <div class="whobar">
+      <span>You are:</span>
+      <button data-me="Greg">Greg</button>
+      <button data-me="Benoit">Benoit</button>
+      <button data-me="Sam">Sam</button>
+    </div>
     <div class="tabs">
       <button class="tab on" data-t="schedule">Schedule</button>
+      <button class="tab" data-t="available">Up for grabs<span class="badge" id="availBadge">0</span></button>
       <button class="tab" data-t="draft">Draft</button>
       <button class="tab" data-t="fairness">Fairness</button>
       <button class="tab" data-t="sales">Sales &amp; settle</button>
@@ -142,74 +152,67 @@
 </header>
 
 <div class="wrap">
-  <!-- FAIRNESS -->
-  <section id="fairness">
-    <h2 class="sec">Is it balanced?</h2>
-    <div id="balanceMsg" class="balance ok"></div>
-    <div class="fair" id="fairCards"></div>
-    <div class="legend">
-      <span><b>Tier A</b> marquee (3 pts)</span>
-      <span><b>Tier B</b> standard (2 pts)</span>
-      <span><b>Tier C</b> quiet night (1 pt)</span>
-      <span>Aim: games within 1, points within ~2.</span>
-    </div>
-  </section>
-
-  <!-- DRAFT -->
-  <section id="draft">
-    <h2 class="sec">Run the draft</h2>
-    <p class="note" style="margin:-6px 0 16px">Snake order keeps it fair: whoever picks last one round picks first the next. Pick around the dates your family can't make — the tracker keeps tier points even. Assign an owner to every game, then it's locked in.</p>
-    <div class="card" style="padding:16px 20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
-        <div>
-          <div class="note" style="font-weight:700">On the clock</div>
-          <div id="onClock" style="font-size:1.3rem;font-weight:800"></div>
-        </div>
-        <div id="draftTotals" style="display:flex;gap:18px"></div>
-        <button class="ghost" id="resetDraft">Clear all picks</button>
-      </div>
-    </div>
-    <div id="draftHint" class="balance ok" style="margin-bottom:16px"></div>
-    <div id="draftPool"></div>
-  </section>
-
-
   <section id="schedule" class="on">
     <h2 class="sec">Home games &amp; who has them</h2>
-    <p class="note" style="margin:-6px 0 14px">All 16 John Cain Arena home games, confirmed from the NBL schedule. Change any owner from the dropdown, or use the Draft tab to assign them fresh. Fairness updates live.</p>
+    <p class="note" style="margin:-4px 0 14px">Can't make one of yours? Hit "Can't go" and it's offered to the others. Everything syncs live.</p>
     <table>
-      <thead><tr>
-        <th>#</th><th>Date</th><th>Opponent</th><th>Tier</th>
-        <th>Owner</th><th class="hidesm">Note</th>
-      </tr></thead>
+      <thead><tr><th>#</th><th>When</th><th>Opponent</th><th>Owner</th><th>Status</th><th class="hidesm"></th></tr></thead>
       <tbody id="schedBody"></tbody>
     </table>
     <div class="savenote" id="save1"></div>
   </section>
 
-  <!-- SALES -->
+  <section id="available">
+    <h2 class="sec">Up for grabs</h2>
+    <p class="note" style="margin:-4px 0 14px">Games someone can't make. Claim one and it becomes yours.</p>
+    <div id="availList"></div>
+    <h2 class="sec" style="margin-top:26px">Recent activity</h2>
+    <div id="activityLog"></div>
+  </section>
+
+  <section id="draft">
+    <h2 class="sec">Run the draft</h2>
+    <p class="note" style="margin:-4px 0 14px">Snake order: 1-2-3, then 3-2-1, repeating. Five games each, plus one night everyone goes together.</p>
+    <div class="card" style="padding:15px 18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+        <div><div class="note" style="font-weight:700">On the clock</div>
+          <div id="onClock" style="font-size:1.25rem;font-weight:800"></div></div>
+        <div id="draftTotals" style="display:flex;gap:18px"></div>
+        <button class="ghost" id="resetDraft">Clear all picks</button>
+      </div>
+      <div id="poolBar" class="poolbar"></div>
+    </div>
+    <div id="draftHint" class="balance ok"></div>
+    <div id="draftPool"></div>
+  </section>
+
+  <section id="fairness">
+    <h2 class="sec">Is it balanced?</h2>
+    <div id="balanceMsg" class="balance ok"></div>
+    <div id="sharedNote"></div>
+    <div class="fair" id="fairCards"></div>
+    <p class="note" style="margin-top:10px">Five games each is the target. The breakdown shows what kind of nights they are, since a Sunday afternoon and a Thursday school night aren't the same thing with kids.</p>
+  </section>
+
   <section id="sales">
     <h2 class="sec">Log a seat sale</h2>
     <div class="card">
       <div class="row">
-        <div class="field"><label>Game</label>
-          <select id="sGame"></select></div>
+        <div class="field"><label>Game</label><select id="sGame"></select></div>
         <div class="field sm"><label>Seats</label><input id="sSeats" type="number" min="1" max="4" value="2"></div>
         <div class="field sm"><label>$ / seat</label><input id="sPrice" type="number" min="0" value="30"></div>
         <div class="field"><label>Seller (gets paid)</label><select id="sSeller"></select></div>
         <div class="field"><label>Buyer (pays)</label><select id="sBuyer"></select></div>
         <button class="act" id="addSale">Add sale</button>
       </div>
-      <p class="note" style="margin-top:10px">Tip: agree one fixed price up front so there's never a negotiation. Default $30 = face value — change it to yours.</p>
+      <p class="note" style="margin-top:10px">For money changing hands on individual seats. Handing over a whole game is done on "Up for grabs".</p>
     </div>
-
     <h2 class="sec">Transactions</h2>
     <table>
-      <thead><tr><th>Date</th><th>Game</th><th>Seats</th><th>$/seat</th><th>Amount</th><th>Seller</th><th>Buyer</th><th></th></tr></thead>
+      <thead><tr><th>Logged</th><th>Game</th><th>Seats</th><th>$/seat</th><th>Amount</th><th>Seller</th><th>Buyer</th><th></th></tr></thead>
       <tbody id="saleBody"></tbody>
     </table>
-
-    <h2 class="sec" style="margin-top:26px">Season settlement</h2>
+    <h2 class="sec" style="margin-top:24px">Season settlement</h2>
     <div class="settle" id="settleCards"></div>
     <p class="note" id="settleCheck" style="text-align:center;margin-top:12px"></p>
   </section>
@@ -218,353 +221,384 @@
 <script>
 // ═══════════════════════════════════════════════════════════════════
 //  SUPABASE SETUP — paste your two values here (see the setup guide).
-//  Until you do, the dashboard runs in LOCAL mode (this device only).
+//  Until you do, this runs in LOCAL mode (this device only).
 // ═══════════════════════════════════════════════════════════════════
-const SUPABASE_URL = "https://irrygewpzjqyoicgwmaj.supabase.co";   // e.g. "https://abcdefgh.supabase.co"
-const SUPABASE_KEY = "sb_publishable__0kgdep3Kb3e9w5Z8nyTLw_1csPuDPV";   // your anon public key (long string starting eyJ...)
-const ROOM_ID = "united-2627";   // any shared name; all three families use the same one
+const SUPABASE_URL = "https://irrygewpzjqyoicgwmaj.supabase.co";   // e.g. "https://abcdefgh.supabase.co"  (no trailing path)
+const SUPABASE_KEY = "sb_publishable__0kgdep3Kb3e9w5Z8nyTLw_1csPuDPV";   // your anon / publishable key
+const ROOM_ID = "united-2627";   // all three families use the same value
 // ═══════════════════════════════════════════════════════════════════
 
-// ---------- Data ----------
 const FAMILIES = ["Greg","Benoit","Sam"];
-const HUE = {"Greg":"var(--a)","Benoit":"var(--b)","Sam":"var(--c)"};
-const CHIP = {"Greg":"chipA","Benoit":"chipB","Sam":"chipC"};
-const TIERPTS = {A:3,B:2,C:1};
+const ALL = "Everyone";
+const HUE = {Greg:"var(--a)",Benoit:"var(--b)",Sam:"var(--c)",Everyone:"var(--all)"};
+let ME = null;
 
 const DEFAULT_GAMES = [
-  {n:1,date:"Sat 19 Sep",opp:"Adelaide 36ers",tier:"A",note:"R1 · Opening Night — Ingles debut",owner:"Greg",ph:false},
-  {n:2,date:"Thu 24 Sep",opp:"SE Melbourne Phoenix",tier:"A",note:"R2 · Throwdown",owner:"Benoit",ph:false},
-  {n:3,date:"Sat 03 Oct",opp:"Cairns Taipans",tier:"C",note:"R3",owner:"Sam",ph:false},
-  {n:4,date:"Sat 10 Oct",opp:"SE Melbourne Phoenix",tier:"A",note:"R4 · Throwdown",owner:"Greg",ph:false},
-  {n:5,date:"Sun 18 Oct",opp:"Illawarra Hawks",tier:"B",note:"R5",owner:"Sam",ph:false},
-  {n:6,date:"Sun 25 Oct",opp:"Sydney Kings",tier:"A",note:"R6",owner:"Benoit",ph:false},
-  {n:7,date:"Mon 02 Nov",opp:"NZ Breakers",tier:"C",note:"R7",owner:"Benoit",ph:false},
-  {n:8,date:"Sat 07 Nov",opp:"Brisbane Bullets",tier:"C",note:"R8",owner:"Greg",ph:false},
-  {n:9,date:"Sat 14 Nov",opp:"SE Melbourne Phoenix",tier:"A",note:"R9 · Throwdown",owner:"Sam",ph:false},
-  {n:10,date:"Sat 21 Nov",opp:"NZ Breakers",tier:"B",note:"R10",owner:"Sam",ph:false},
-  {n:11,date:"Sun 06 Dec",opp:"Brisbane Bullets",tier:"C",note:"R11",owner:"Greg",ph:false},
-  {n:12,date:"Sat 12 Dec",opp:"Tasmania JackJumpers",tier:"C",note:"R12",owner:"Benoit",ph:false},
-  {n:13,date:"Wed 23 Dec",opp:"Cairns Taipans",tier:"C",note:"R14 · 12 Days of Christmas",owner:"Sam",ph:false},
-  {n:14,date:"Sun 07 Feb",opp:"Perth Wildcats",tier:"A",note:"R20",owner:"Sam",ph:false},
-  {n:15,date:"Thu 11 Feb",opp:"SE Melbourne Phoenix",tier:"A",note:"R21 · Throwdown",owner:"Benoit",ph:false},
-  {n:16,date:"Sat 13 Feb",opp:"Illawarra Hawks",tier:"B",note:"R21",owner:"Greg",ph:false},
-];
+  {n:1, day:"Sat",date:"19 Sep",time:"7:30pm",school:false,opp:"Adelaide 36ers",note:"Opening Night — Ingles debut",big:true, owner:ALL},
+  {n:2, day:"Thu",date:"24 Sep",time:"7:30pm",school:true, opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Benoit"},
+  {n:3, day:"Sat",date:"03 Oct",time:"7:30pm",school:false,opp:"Cairns Taipans",note:"",big:false,owner:"Sam"},
+  {n:4, day:"Sat",date:"10 Oct",time:"7:30pm",school:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Greg"},
+  {n:5, day:"Sun",date:"18 Oct",time:"5:00pm",school:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Sam"},
+  {n:6, day:"Sun",date:"25 Oct",time:"5:00pm",school:false,opp:"Sydney Kings",note:"",big:true, owner:"Benoit"},
+  {n:7, day:"Mon",date:"02 Nov",time:"7:30pm",school:true, opp:"NZ Breakers",note:"",big:false,owner:"Benoit"},
+  {n:8, day:"Sat",date:"07 Nov",time:"7:30pm",school:false,opp:"Brisbane Bullets",note:"",big:false,owner:"Greg"},
+  {n:9, day:"Sat",date:"14 Nov",time:"7:30pm",school:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Sam"},
+  {n:10,day:"Sat",date:"21 Nov",time:"7:30pm",school:false,opp:"NZ Breakers",note:"",big:false,owner:"Sam"},
+  {n:11,day:"Sun",date:"06 Dec",time:"3:00pm",school:false,opp:"Brisbane Bullets",note:"earliest tip of the season",big:false,owner:"Greg"},
+  {n:12,day:"Sat",date:"12 Dec",time:"7:30pm",school:false,opp:"Tasmania JackJumpers",note:"",big:false,owner:"Benoit"},
+  {n:13,day:"Wed",date:"23 Dec",time:"8:00pm",school:false,opp:"Cairns Taipans",note:"school holidays",big:false,owner:"Sam"},
+  {n:14,day:"Sun",date:"07 Feb",time:"5:00pm",school:false,opp:"Perth Wildcats",note:"",big:true, owner:"Greg"},
+  {n:15,day:"Thu",date:"11 Feb",time:"7:30pm",school:true, opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Benoit"},
+  {n:16,day:"Sat",date:"13 Feb",time:"5:30pm",school:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Greg"},
+].map(g=>({...g,drafted:true,status:"held"}));
 
-let games = [];
-let sales = [];
+let games = [], sales = [], activity = [];
 
-// ---------- Persistence: Supabase (shared) with local fallback ----------
-const CLOUD = SUPABASE_URL && SUPABASE_KEY;
-const REST = CLOUD ? `${SUPABASE_URL}/rest/v1/ticket_state` : null;
-const HEADERS = CLOUD ? {
-  "apikey": SUPABASE_KEY,
-  "Authorization": `Bearer ${SUPABASE_KEY}`,
-  "Content-Type": "application/json",
-  "Prefer": "resolution=merge-duplicates,return=minimal"
-} : null;
+// ---------- Persistence: one row per record ----------
+const CLOUD = !!(SUPABASE_URL && SUPABASE_KEY);
+const REST = CLOUD ? SUPABASE_URL.replace(/\/+$/,"") + "/rest/v1/ticket_rows" : null;
+const H = CLOUD ? {"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,
+  "Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"} : null;
+let syncTimer=null, inFlight=0, lastSnapshot="";
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const rowId=(k,key)=>`${ROOM_ID}|${k}|${key}`;
 
-let lastSavedJSON = "";      // to detect remote changes vs our own
-let syncTimer = null;
-let saving = false;
+async function putRow(kind,key,data){
+  if(!CLOUD) return true;
+  inFlight++;
+  try{
+    const r=await fetch(REST,{method:"POST",headers:H,
+      body:JSON.stringify({id:rowId(kind,key),room:ROOM_ID,kind,data})});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return true;
+  }catch(e){ console.warn(e); flash("Couldn't save — check connection"); return false; }
+  finally{ inFlight--; }
+}
+async function delRow(kind,key){
+  if(!CLOUD) return true;
+  inFlight++;
+  try{
+    const r=await fetch(`${REST}?id=eq.${encodeURIComponent(rowId(kind,key))}`,{method:"DELETE",headers:H});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return true;
+  }catch(e){ console.warn(e); flash("Couldn't delete — check connection"); return false; }
+  finally{ inFlight--; }
+}
+async function fetchAll(){
+  const r=await fetch(`${REST}?room=eq.${ROOM_ID}&select=id,kind,data`,{headers:H});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
+}
+// Only these fields live in the database. Fixture details (day, date, time,
+// opponent, note) always come from DEFAULT_GAMES above, so corrections to the
+// schedule flow through on the next page load without touching stored data.
+const stateOf = g => ({n:g.n, owner:g.owner, drafted:g.drafted, status:g.status});
+const VALID_OWNERS = [...FAMILIES, ALL];
 
-function currentState(){ return { games, sales }; }
+function applyRows(rows){
+  const state={},s=[],a=[];
+  rows.forEach(r=>{
+    if(r.kind==="game" && r.data && r.data.n!=null){
+      const d=r.data;
+      state[d.n]={
+        owner: VALID_OWNERS.includes(d.owner) ? d.owner : undefined,
+        drafted: typeof d.drafted==="boolean" ? d.drafted : undefined,
+        status: ["held","offered"].includes(d.status) ? d.status : undefined
+      };
+    }
+    else if(r.kind==="sale") s.push(r.data);
+    else if(r.kind==="activity") a.push(r.data);
+  });
+  // fixture from code + saved state from cloud
+  games = DEFAULT_GAMES.map(base=>{
+    const st=state[base.n]||{};
+    return {...base,
+      ...(st.owner!==undefined?{owner:st.owner}:{}),
+      ...(st.drafted!==undefined?{drafted:st.drafted}:{}),
+      ...(st.status!==undefined?{status:st.status}:{})};
+  });
+  sales=s.sort((x,y)=>(y.ts||0)-(x.ts||0));
+  activity=a.sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,40);
+}
+const snapshot=()=>JSON.stringify({games,sales,activity});
 
 async function load(){
+  games=structuredClone(DEFAULT_GAMES); sales=[]; activity=[];
   if(CLOUD){
     try{
-      const r = await fetch(`${REST}?id=eq.${ROOM_ID}&select=data`, {headers:HEADERS});
-      const rows = await r.json();
-      if(rows && rows.length && rows[0].data){
-        games = rows[0].data.games || structuredClone(DEFAULT_GAMES);
-        sales = rows[0].data.sales || [];
-        lastSavedJSON = JSON.stringify(rows[0].data);
-      }else{
-        // first run: seed the room with defaults
-        games = structuredClone(DEFAULT_GAMES); sales = [];
-        await pushState(true);
-      }
-      startPolling();
-      return;
-    }catch(e){
-      console.warn("Cloud load failed, using local defaults", e);
-      flash("save1","Offline — showing local copy");
-    }
+      const rows=await fetchAll();
+      if(rows.some(r=>r.kind==="game")) applyRows(rows);   // merges over the code fixture
+      else for(const g of games) await putRow("game",g.n,stateOf(g));
+      lastSnapshot=snapshot(); startPolling(); return;
+    }catch(e){ console.warn("Cloud load failed",e); flash("Offline — local copy only"); }
   }
-  // local fallback
-  games = structuredClone(DEFAULT_GAMES); sales = [];
 }
-
-async function pushState(silent){
-  if(!CLOUD){ return; }
-  saving = true;
-  if(!silent) flash("save1","Saving…");
-  const body = JSON.stringify({ id: ROOM_ID, data: currentState() });
-  try{
-    const r = await fetch(REST, {method:"POST", headers:HEADERS, body});
-    if(!r.ok) throw new Error("HTTP "+r.status);
-    lastSavedJSON = JSON.stringify(currentState());
-    if(!silent) flash("save1","Saved for everyone ✓");
-  }catch(e){
-    flash("save1","Couldn't save — check connection");
-    console.warn(e);
-  }finally{ saving = false; }
-}
-
 function startPolling(){
   if(syncTimer) clearInterval(syncTimer);
-  syncTimer = setInterval(async ()=>{
-    if(saving) return;                       // don't clobber an in-flight save
+  syncTimer=setInterval(async()=>{
+    if(inFlight>0) return;
     try{
-      const r = await fetch(`${REST}?id=eq.${ROOM_ID}&select=data`, {headers:HEADERS});
-      const rows = await r.json();
-      if(rows && rows.length && rows[0].data){
-        const incoming = JSON.stringify(rows[0].data);
-        if(incoming !== lastSavedJSON){        // someone else changed it
-          games = rows[0].data.games || games;
-          sales = rows[0].data.sales || sales;
-          lastSavedJSON = incoming;
-          renderSchedule(); renderDraft(); renderFairness(); fillSelects(); renderSales(); renderSettle();
-          flash("save1","Updated from another family ✓");
-        }
-      }
-    }catch(e){ /* transient; ignore */ }
-  }, 4000);
+      const rows=await fetchAll(); applyRows(rows);
+      const s=snapshot();
+      if(s!==lastSnapshot){ lastSnapshot=s; renderAll(); flash("Updated from another family ✓"); }
+    }catch(e){}
+  },4000);
+}
+async function saveGame(g){ const ok=await putRow("game",g.n,stateOf(g)); if(ok){lastSnapshot=snapshot(); flash("Saved ✓");} return ok; }
+async function saveSale(s){ const ok=await putRow("sale",s.id,s); if(ok) lastSnapshot=snapshot(); return ok; }
+async function logActivity(text){
+  const i={id:uid(),ts:Date.now(),text,when:new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short"})};
+  activity.unshift(i); await putRow("activity",i.id,i); lastSnapshot=snapshot();
+}
+function flash(msg){
+  const t=[document.getElementById("save1"),document.getElementById("syncPill")].filter(Boolean);
+  t.forEach(el=>el.textContent=msg);
+  if(msg.includes("✓")) setTimeout(()=>t.forEach(el=>{
+    if(el.textContent===msg) el.textContent=CLOUD?"Synced with Greg, Benoit & Sam":""; }),2500);
 }
 
-// both saves write the whole shared state
-async function saveGames(){ await pushState(false); }
-async function saveSales(){ await pushState(true); }
+// ---------- Helpers ----------
+const owned=f=>games.filter(g=>g.owner===f&&g.drafted!==false);
+const sharedGames=()=>games.filter(g=>g.owner===ALL&&g.drafted!==false);
+const whenLine=g=>`${g.day} ${g.date} · <span class="time">${g.time}</span>`
+  +(g.school?' <span class="schooltag">school night</span>':'')
+  +(g.big?' <span class="biggame">big one</span>':'');
+function requireMe(){ if(!ME){ alert("Tap your name at the top first, so we know who's acting."); return false; } return true; }
 
-function flash(id,msg){
-  const targets=[document.getElementById(id), document.getElementById("syncPill")].filter(Boolean);
-  targets.forEach(el=>{ el.textContent=msg; });
-  if(msg.includes("✓")) setTimeout(()=>{ targets.forEach(el=>{ if(el.textContent===msg) el.textContent = CLOUD ? "Synced with Greg, Benoit & Sam" : ""; }); },2500);
-}
-
-// ---------- Render: draft ----------
-function tierPts(f, onlyDrafted){
-  return games.reduce((s,g)=> s + ((g.owner===f && (!onlyDrafted || g.drafted!==false)) ? TIERPTS[g.tier] : 0), 0);
-}
-function snakePicker(pickNumber){
-  // pickNumber is 0-indexed; snake over 3 families
-  const round = Math.floor(pickNumber/3);
-  const pos = pickNumber%3;
-  const order = round%2===0 ? [0,1,2] : [2,1,0];
-  return FAMILIES[order[pos]];
-}
-function renderDraft(){
-  const undrafted = games.filter(g=>g.drafted===false);
-  const draftedCount = games.length - undrafted.length;
-  // totals (drafted only)
-  const tot = document.getElementById("draftTotals"); tot.innerHTML="";
-  FAMILIES.forEach(f=>{
-    const gc = games.filter(g=>g.owner===f && g.drafted!==false).length;
-    const el=document.createElement("div"); el.className="dtot";
-    el.innerHTML=`<div class="n" style="color:${HUE[f]}">${tierPts(f,true)}</div><div class="l">${f} · ${gc}g</div>`;
-    tot.appendChild(el);
-  });
-  const onClock = document.getElementById("onClock");
-  const hint = document.getElementById("draftHint");
-  if(undrafted.length===0){
-    onClock.textContent = "Draft complete ✓";
-    onClock.style.color = "var(--good)";
-    hint.className="balance ok";
-    const pts = FAMILIES.map(f=>tierPts(f,true));
-    hint.textContent = `All 16 games assigned. Tier points ${pts.join(" / ")} — spread of ${Math.max(...pts)-Math.min(...pts)}.`;
-  }else{
-    const picker = snakePicker(draftedCount);
-    onClock.textContent = picker;
-    onClock.style.color = HUE[picker];
-    // who's lowest on points -> suggest they grab a marquee
-    const low = [...FAMILIES].sort((a,b)=>tierPts(a,true)-tierPts(b,true))[0];
-    hint.className="balance ok";
-    hint.textContent = draftedCount===0
-      ? "Pick order snakes 1-2-3, 3-2-1, and repeats. Assign any game to whoever's on the clock."
-      : `${picker} picks next. ${low} is lowest on tier points — a marquee game evens it up.`;
-  }
-  // pool
-  const pool = document.getElementById("draftPool"); pool.innerHTML="";
-  const list = undrafted.length ? undrafted : games; // show all when done
-  list.forEach(g=>{
-    const el=document.createElement("div"); el.className="dgame"+(g.drafted!==false?" taken":"");
-    const picks = FAMILIES.map(f=>{
-      const on = g.owner===f && g.drafted!==false;
-      return `<button class="${on?'pk':''}" data-n="${g.n}" data-f="${f}" style="${on?`background:${HUE[f]}`:''}">${f}</button>`;
-    }).join("");
-    el.innerHTML=`
-      <span class="tierpill t${g.tier}">${g.tier}</span>
-      <div class="g-meta">
-        <div class="g-opp">#${g.n} · ${g.opp}</div>
-        <div class="g-sub">${g.date}${g.note?' · '+g.note:''}</div>
-      </div>
-      <div class="dpick">${picks}</div>`;
-    pool.appendChild(el);
-  });
-  pool.querySelectorAll(".dpick button").forEach(b=>b.addEventListener("click",e=>{
-    const n=+e.target.dataset.n, f=e.target.dataset.f;
-    const g=games.find(x=>x.n===n);
-    g.owner=f; g.drafted=true;
-    saveGames(); renderDraft(); renderSchedule(); renderFairness();
-  }));
-}
-document.getElementById("resetDraft").addEventListener("click",()=>{
-  if(!confirm("Clear every pick and draft from scratch? This lets all three families pick fresh.")) return;
-  games.forEach(g=>g.drafted=false);
-  saveGames(); renderDraft(); renderSchedule(); renderFairness();
-});
-
-// ---------- Render: schedule ----------
+// ---------- Schedule ----------
 function renderSchedule(){
-  const tb = document.getElementById("schedBody"); tb.innerHTML="";
-  games.forEach((g,i)=>{
-    const tr = document.createElement("tr");
-    const opts = FAMILIES.map(f=>`<option ${f===g.owner?"selected":""}>${f}</option>`).join("");
-    const tierOpts=["A","B","C"].map(t=>`<option ${t===g.tier?"selected":""}>${t}</option>`).join("");
-    tr.innerHTML = `
-      <td style="font-weight:700;color:var(--muted)">${g.n}</td>
-      <td><span class="edit date" data-i="${i}" contenteditable="true">${g.date}</span>${g.ph?' <span class="note">(edit)</span>':''}</td>
-      <td style="font-weight:600"><span class="edit opp" data-i="${i}" contenteditable="true">${g.opp}</span></td>
-      <td><select class="tiersel" data-i="${i}">${tierOpts}</select></td>
-      <td><select class="assign" data-i="${i}" style="border-color:${HUE[g.owner]}">${opts}</select></td>
-      <td class="hidesm note">${g.note}</td>`;
+  const tb=document.getElementById("schedBody"); tb.innerHTML="";
+  games.forEach(g=>{
+    const opts=[...FAMILIES,ALL].map(f=>`<option ${f===g.owner?"selected":""}>${f}</option>`).join("");
+    const isAll=g.owner===ALL;
+    const st=isAll?`<span class="statustag st-held">All together</span>`
+      :g.status==="offered"?`<span class="statustag st-offered">Up for grabs</span>`
+      :`<span class="statustag st-held">Held</span>`;
+    const act=isAll?"":(g.status==="offered"
+      ?`<button class="ghost tiny" data-un="${g.n}">Cancel offer</button>`
+      :`<button class="ghost tiny" data-cant="${g.n}">Can't go</button>`);
+    const tr=document.createElement("tr");
+    if(isAll) tr.className="shared";
+    tr.innerHTML=`<td style="font-weight:700;color:var(--muted)">${g.n}</td>
+      <td>${g.day} ${g.date}<div class="note"><span class="time">${g.time}</span>${g.school?' <span class="schooltag">school night</span>':''}</div></td>
+      <td style="font-weight:600">${g.opp}${g.big?' <span class="biggame">big one</span>':''}<div class="note">${g.note||""}</div></td>
+      <td><select class="assign" data-n="${g.n}" style="border-color:${HUE[g.owner]}">${opts}</select></td>
+      <td>${st}</td><td class="hidesm">${act}</td>`;
     tb.appendChild(tr);
   });
-  tb.querySelectorAll("select.assign").forEach(sel=>{
-    sel.addEventListener("change",e=>{
-      games[+e.target.dataset.i].owner = e.target.value;
-      games[+e.target.dataset.i].drafted = true;
-      e.target.style.borderColor = HUE[e.target.value];
-      saveGames(); renderFairness(); renderDraft();
-    });
-  });
-  tb.querySelectorAll("select.tiersel").forEach(sel=>{
-    sel.addEventListener("change",e=>{
-      games[+e.target.dataset.i].tier = e.target.value;
-      saveGames(); renderSchedule(); renderFairness(); renderDraft();
-    });
-  });
-  tb.querySelectorAll(".edit.date").forEach(el=>el.addEventListener("blur",e=>{
-    games[+e.target.dataset.i].date=e.target.textContent.trim(); saveGames();
+  tb.querySelectorAll("select.assign").forEach(s=>s.addEventListener("change",async e=>{
+    const g=games.find(x=>x.n==e.target.dataset.n), from=g.owner;
+    g.owner=e.target.value; g.drafted=true;
+    if(g.owner===ALL) g.status="held";
+    e.target.style.borderColor=HUE[g.owner];
+    await saveGame(g); await logActivity(`#${g.n} ${g.opp}: ${from} → ${g.owner}`); renderAll();
   }));
-  tb.querySelectorAll(".edit.opp").forEach(el=>el.addEventListener("blur",e=>{
-    games[+e.target.dataset.i].opp=e.target.textContent.trim(); saveGames(); fillSelects();
+  tb.querySelectorAll("[data-cant]").forEach(b=>b.addEventListener("click",async e=>{
+    const g=games.find(x=>x.n==e.target.dataset.cant);
+    if(!requireMe()) return;
+    if(ME!==g.owner && !confirm(`That game belongs to ${g.owner}, not you. Offer it anyway?`)) return;
+    g.status="offered"; await saveGame(g);
+    await logActivity(`${ME} can't make #${g.n} ${g.opp} (${g.day} ${g.date}, ${g.time}) — up for grabs`);
+    renderAll(); alert(`#${g.n} ${g.opp} is up for grabs. Give the others a nudge in the group chat too.`);
+  }));
+  tb.querySelectorAll("[data-un]").forEach(b=>b.addEventListener("click",async e=>{
+    const g=games.find(x=>x.n==e.target.dataset.un);
+    g.status="held"; await saveGame(g);
+    await logActivity(`Offer withdrawn on #${g.n} ${g.opp}`); renderAll();
   }));
 }
 
-// ---------- Render: fairness ----------
-function tally(){
-  const t={}; FAMILIES.forEach(f=>t[f]={games:0,A:0,B:0,C:0,pts:0});
-  games.forEach(g=>{ if(t[g.owner]){t[g.owner].games++; t[g.owner][g.tier]++; t[g.owner].pts+=TIERPTS[g.tier];} });
-  return t;
-}
-function renderFairness(){
-  const t = tally();
-  const cards = document.getElementById("fairCards"); cards.innerHTML="";
-  const counts = FAMILIES.map(f=>t[f].games), pts = FAMILIES.map(f=>t[f].pts);
-  FAMILIES.forEach(f=>{
-    const d=t[f], total=d.A+d.B+d.C||1;
-    const pA=d.A/total*100,pB=d.B/total*100,pC=d.C/total*100;
-    const el=document.createElement("div"); el.className="fcard";
-    el.innerHTML=`
-      <div class="fam"><span class="dot" style="background:${HUE[f]}"></span>${f}</div>
-      <div class="big">${d.games}<span style="font-size:.9rem;color:var(--muted);font-weight:600"> games</span></div>
-      <div class="lil">${d.pts} tier points · ${d.A}A ${d.B}B ${d.C}C</div>
-      <div class="tierbar">
-        <i style="width:${pA}%;background:var(--a)"></i>
-        <i style="width:${pB}%;background:#E8B93A"></i>
-        <i style="width:${pC}%;background:#9FB0C4"></i>
-      </div>`;
-    cards.appendChild(el);
+// ---------- Up for grabs ----------
+function renderAvailable(){
+  const list=document.getElementById("availList"); list.innerHTML="";
+  const off=games.filter(g=>g.status==="offered"&&g.owner!==ALL);
+  const b=document.getElementById("availBadge");
+  b.textContent=off.length; b.classList.toggle("show",off.length>0);
+  if(!off.length) list.innerHTML=`<div class="empty">Nothing up for grabs. If you can't make one of yours, hit "Can't go" on the Schedule tab.</div>`;
+  off.forEach(g=>{
+    const others=FAMILIES.filter(f=>f!==g.owner);
+    list.insertAdjacentHTML("beforeend",
+      `<div class="ogame"><div class="g-meta">
+        <div class="g-opp">#${g.n} · ${g.opp}</div>
+        <div class="g-sub">${whenLine(g)} · offered by <b>${g.owner}</b></div></div>
+        <div class="dpick">${others.map(f=>`<button data-claim="${g.n}" data-by="${f}">${f} takes it</button>`).join("")}
+          <button class="allbtn" data-claim="${g.n}" data-by="${ALL}">All together</button></div></div>`);
   });
-  const gSpread=Math.max(...counts)-Math.min(...counts);
-  const pSpread=Math.max(...pts)-Math.min(...pts);
-  const msg=document.getElementById("balanceMsg");
-  if(gSpread<=1 && pSpread<=2){
-    msg.className="balance ok";
-    msg.textContent=`Balanced — games within ${gSpread}, tier points within ${pSpread}. Good to lock in.`;
+  list.querySelectorAll("[data-claim]").forEach(btn=>btn.addEventListener("click",async e=>{
+    const n=+e.target.dataset.claim, by=e.target.dataset.by;
+    const g=games.find(x=>x.n===n), from=g.owner;
+    const msg=by===ALL
+      ? `Make #${n} ${g.opp} an all-together night?\n\nIt stops counting toward anyone's five.`
+      : `${by} takes #${n} ${g.opp} (${g.day} ${g.date}, ${g.time}).\n\n${from} gives it up; it counts toward ${by}'s five instead.`;
+    if(!confirm(msg)) return;
+    g.owner=by; g.status="held"; g.drafted=true;
+    await saveGame(g); await logActivity(`#${g.n} ${g.opp}: ${from} → ${by}`); renderAll();
+  }));
+  const log=document.getElementById("activityLog");
+  log.innerHTML=activity.length
+    ? activity.map(a=>`<div class="log"><b>${a.when}</b> · ${a.text}</div>`).join("")
+    : `<div class="empty">No activity yet.</div>`;
+}
+
+// ---------- Draft ----------
+const snakePicker=p=>{const r=Math.floor(p/3),i=p%3,o=r%2===0?[0,1,2]:[2,1,0];return FAMILIES[o[i]];};
+function renderDraft(){
+  const und=games.filter(g=>g.drafted===false);
+  const done=games.filter(g=>g.drafted!==false&&g.owner!==ALL).length;  // shared games don't use a pick
+  const shared=sharedGames();
+  const target=Math.floor((games.length-shared.length)/3);
+
+  const tot=document.getElementById("draftTotals"); tot.innerHTML="";
+  FAMILIES.forEach(f=>tot.insertAdjacentHTML("beforeend",
+    `<div class="dtot"><div class="n" style="color:${HUE[f]}">${owned(f).length}</div><div class="l">${f}</div></div>`));
+
+  document.getElementById("poolBar").innerHTML = shared.length
+    ? `<span><b>${shared.length}</b> night${shared.length>1?"s":""} everyone goes together — the other <b>${games.length-shared.length}</b> split <b>${target} each</b>.</span>`
+    : `<span>Tip: mark one night <b>All together</b> and the rest divide evenly — ${games.length} games leaves an awkward remainder otherwise.</span>`;
+
+  const clock=document.getElementById("onClock"), hint=document.getElementById("draftHint");
+  if(!und.length){
+    clock.textContent="Draft complete ✓"; clock.style.color="var(--good)";
+    const c=FAMILIES.map(f=>owned(f).length), spread=Math.max(...c)-Math.min(...c);
+    hint.className=spread<=1?"balance ok":"balance off";
+    hint.textContent=`All ${games.length} games assigned — ${c.join(" / ")}${shared.length?`, plus ${shared.length} all-together`:""}.`
+      +(spread<=1?" Evenly split.":" One family has more than the others.");
   }else{
-    msg.className="balance off";
-    msg.textContent=`Not quite even — games differ by ${gSpread}, points by ${pSpread}. Reassign a game or two on the Schedule tab.`;
+    const p=snakePicker(done);
+    clock.textContent=p; clock.style.color=HUE[p];
+    hint.className="balance ok";
+    hint.textContent=done===0
+      ? "Snake order: 1-2-3, then 3-2-1, repeating. Pick whatever suits your family."
+      : `${p} picks next.`;
   }
+
+  const pool=document.getElementById("draftPool"); pool.innerHTML="";
+  (und.length?und:games).forEach(g=>{
+    const picks=FAMILIES.map(f=>{
+      const on=g.owner===f&&g.drafted!==false;
+      return `<button class="${on?'pk':''}" data-n="${g.n}" data-f="${f}" style="${on?`background:${HUE[f]}`:''}">${f}</button>`;
+    }).join("");
+    const allOn=g.owner===ALL&&g.drafted!==false;
+    const allBtn=`<button class="allbtn ${allOn?'pk':''}" data-n="${g.n}" data-f="${ALL}" style="${allOn?`background:${HUE[ALL]};color:#fff`:''}">All together</button>`;
+    pool.insertAdjacentHTML("beforeend",
+      `<div class="dgame${g.drafted!==false?(allOn?" shared":" taken"):""}">
+        <div class="g-meta"><div class="g-opp">${whenLine(g)}</div>
+        <div class="g-sub">#${g.n} ${g.opp}${g.note?" · "+g.note:""}</div></div>
+        <div class="dpick">${picks}${allBtn}</div></div>`);
+  });
+  pool.querySelectorAll(".dpick button").forEach(b=>b.addEventListener("click",async e=>{
+    const g=games.find(x=>x.n==e.target.dataset.n);
+    g.owner=e.target.dataset.f; g.drafted=true; g.status="held";
+    await saveGame(g); renderAll();
+  }));
+}
+document.getElementById("resetDraft").addEventListener("click",async()=>{
+  if(!confirm("Clear every pick so all three families draft from scratch?")) return;
+  for(const g of games){ g.drafted=false; g.status="held"; await putRow("game",g.n,stateOf(g)); }
+  lastSnapshot=snapshot(); await logActivity("Draft reset — picking from scratch"); renderAll();
+});
+
+// ---------- Fairness ----------
+function renderFairness(){
+  const box=document.getElementById("fairCards"); box.innerHTML="";
+  const shared=sharedGames();
+  const target=Math.floor((games.length-shared.length)/3);
+  const counts=[];
+  FAMILIES.forEach(f=>{
+    const mine=owned(f); counts.push(mine.length);
+    const wknd=mine.filter(g=>["Sat","Sun"].includes(g.day)).length;
+    const sch=mine.filter(g=>g.school).length;
+    const bigs=mine.filter(g=>g.big).length;
+    box.insertAdjacentHTML("beforeend",
+      `<div class="fcard"><div class="fam"><span class="dot" style="background:${HUE[f]}"></span>${f}</div>
+        <div class="big">${mine.length}<span style="font-size:.85rem;color:var(--muted);font-weight:600"> of ${target}</span></div>
+        <div class="lil">${wknd} weekend · ${sch} school night${sch===1?"":"s"} · ${bigs} big game${bigs===1?"":"s"}</div></div>`);
+  });
+  const spread=Math.max(...counts)-Math.min(...counts);
+  const m=document.getElementById("balanceMsg");
+  if(spread<=1&&counts.every(c=>Math.abs(c-target)<=1)){
+    m.className="balance ok"; m.textContent=`Evenly split — ${counts.join(" / ")} games each.`;
+  }else{
+    m.className="balance off"; m.textContent=`Uneven — ${counts.join(" / ")}. Target is ${target} each.`;
+  }
+  const sn=document.getElementById("sharedNote");
+  sn.innerHTML=shared.length
+    ? `<div class="sharedbox"><b>Everyone together:</b> ${shared.map(g=>`${g.opp}, ${g.day} ${g.date} ${g.time}`).join(" · ")}.
+       <div class="note" style="margin-top:5px">Doesn't count toward anyone's tally. With only four seats you'll likely want a couple of extra tickets for this one.</div></div>`
+    : "";
 }
 
-// ---------- Render: sales ----------
+// ---------- Sales ----------
 function fillSelects(){
-  const g=document.getElementById("sGame");
-  g.innerHTML=games.map(x=>`<option value="${x.n}">#${x.n} · ${x.date} · ${x.opp}</option>`).join("");
-  ["sSeller","sBuyer"].forEach(id=>{
-    document.getElementById(id).innerHTML=FAMILIES.map(f=>`<option>${f}</option>`).join("");
-  });
+  document.getElementById("sGame").innerHTML=games.map(g=>`<option value="${g.n}">#${g.n} · ${g.day} ${g.date} ${g.time} · ${g.opp}</option>`).join("");
+  ["sSeller","sBuyer"].forEach(id=>document.getElementById(id).innerHTML=FAMILIES.map(f=>`<option>${f}</option>`).join(""));
   document.getElementById("sBuyer").selectedIndex=1;
 }
 function renderSales(){
   const tb=document.getElementById("saleBody"); tb.innerHTML="";
-  if(!sales.length){ tb.innerHTML=`<tr><td colspan="8" class="empty">No sales logged yet. When seats change hands, add them above.</td></tr>`; }
-  sales.forEach((s,i)=>{
-    const g=games.find(x=>x.n==s.game);
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td class="note">${s.date}</td>
-      <td>#${s.game} ${g?g.opp:""}</td>
-      <td>${s.seats}</td><td>$${s.price}</td><td style="font-weight:700">$${s.seats*s.price}</td>
-      <td><span class="chip ${CHIP[s.seller]}">${s.seller}</span></td>
-      <td><span class="chip ${CHIP[s.buyer]}">${s.buyer}</span></td>
-      <td><button class="ghost" data-i="${i}">Remove</button></td>`;
-    tb.appendChild(tr);
+  if(!sales.length) tb.innerHTML=`<tr><td colspan="8" class="empty">No sales logged yet.</td></tr>`;
+  sales.forEach(s=>{
+    const g=games.find(x=>x.n===s.game);
+    tb.insertAdjacentHTML("beforeend",
+      `<tr><td class="note">${s.date}</td><td>#${s.game} ${g?g.opp:""}</td><td>${s.seats}</td>
+        <td>$${s.price}</td><td style="font-weight:700">$${s.seats*s.price}</td>
+        <td><span class="chip chip${s.seller}">${s.seller}</span></td>
+        <td><span class="chip chip${s.buyer}">${s.buyer}</span></td>
+        <td><button class="ghost tiny" data-del="${s.id}">Remove</button></td></tr>`);
   });
-  tb.querySelectorAll("button.ghost").forEach(b=>b.addEventListener("click",e=>{
-    sales.splice(+e.target.dataset.i,1); saveSales(); renderSales(); renderSettle();
+  tb.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",async e=>{
+    const id=e.target.dataset.del, s=sales.find(x=>x.id===id);
+    if(!s) return;
+    if(!confirm(`Remove this record?\n\n${s.seats} seat(s) for game #${s.game}, $${s.seats*s.price} from ${s.buyer} to ${s.seller}.\n\nThis can't be undone.`)) return;
+    sales=sales.filter(x=>x.id!==id);
+    await delRow("sale",id); lastSnapshot=snapshot();
+    await logActivity(`Sale removed: #${s.game}, $${s.seats*s.price} ${s.buyer}→${s.seller}`);
+    renderAll();
   }));
 }
 function renderSettle(){
-  const net={}; FAMILIES.forEach(f=>net[f]={recv:0,paid:0});
-  sales.forEach(s=>{ const amt=s.seats*s.price; if(net[s.seller])net[s.seller].recv+=amt; if(net[s.buyer])net[s.buyer].paid+=amt; });
-  const box=document.getElementById("settleCards"); box.innerHTML="";
-  let sum=0;
+  const net={}; FAMILIES.forEach(f=>net[f]={r:0,p:0});
+  sales.forEach(s=>{const a=s.seats*s.price; if(net[s.seller])net[s.seller].r+=a; if(net[s.buyer])net[s.buyer].p+=a;});
+  const box=document.getElementById("settleCards"); box.innerHTML=""; let sum=0;
   FAMILIES.forEach(f=>{
-    const n=net[f].recv-net[f].paid; sum+=n;
+    const n=net[f].r-net[f].p; sum+=n;
     const cls=n>0?"owed":n<0?"owes":"even";
-    const verdict=n>0?"the group owes them":n<0?"owes the group":"all square";
-    const el=document.createElement("div"); el.className="scard";
-    el.innerHTML=`<div style="font-weight:800"><span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${HUE[f]};margin-right:6px"></span>${f}</div>
-      <div class="net ${cls}">${n<0?"−":""}$${Math.abs(n)}</div>
-      <div class="verdict ${cls}">${verdict}</div>`;
-    box.appendChild(el);
+    const v=n>0?"the group owes them":n<0?"owes the group":"all square";
+    box.insertAdjacentHTML("beforeend",
+      `<div class="scard"><div style="font-weight:800"><span class="dot" style="background:${HUE[f]}"></span>${f}</div>
+        <div class="net ${cls}">${n<0?"−":""}$${Math.abs(n)}</div>
+        <div style="font-size:.78rem;font-weight:700" class="${cls}">${v}</div></div>`);
   });
-  document.getElementById("settleCheck").textContent = sum===0 ? "Balances to zero ✓ — one round of payments clears it." : "Note: totals should net to zero.";
+  document.getElementById("settleCheck").textContent=sum===0
+    ? "Balances to zero ✓ — one round of payments clears it." : "Totals should net to zero.";
 }
+document.getElementById("addSale").addEventListener("click",async()=>{
+  const seller=document.getElementById("sSeller").value, buyer=document.getElementById("sBuyer").value;
+  if(seller===buyer){ alert("Seller and buyer must be different families."); return; }
+  const seats=+document.getElementById("sSeats").value, price=+document.getElementById("sPrice").value;
+  if(!(seats>0)){ alert("Enter at least one seat."); return; }
+  const s={id:uid(),ts:Date.now(),date:new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short"}),
+    game:+document.getElementById("sGame").value,seats,price,seller,buyer};
+  sales.unshift(s); await saveSale(s); renderAll(); flash("Saved ✓");
+});
 
-// ---------- Tabs ----------
+// ---------- Shell ----------
+function renderAll(){ renderSchedule(); renderAvailable(); renderDraft(); renderFairness(); fillSelects(); renderSales(); renderSettle(); }
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
   document.querySelectorAll("section").forEach(s=>s.classList.remove("on"));
-  t.classList.add("on");
-  document.getElementById(t.dataset.t).classList.add("on");
+  t.classList.add("on"); document.getElementById(t.dataset.t).classList.add("on");
+}));
+document.querySelectorAll("[data-me]").forEach(b=>b.addEventListener("click",()=>{
+  ME=b.dataset.me;
+  document.querySelectorAll("[data-me]").forEach(x=>x.classList.toggle("me",x.dataset.me===ME));
 }));
 
-// ---------- Add sale ----------
-document.getElementById("addSale").addEventListener("click",()=>{
-  const seller=document.getElementById("sSeller").value;
-  const buyer=document.getElementById("sBuyer").value;
-  if(seller===buyer){ alert("Seller and buyer must be different families."); return; }
-  const d=new Date();
-  sales.unshift({
-    date:d.toLocaleDateString("en-AU",{day:"2-digit",month:"short"}),
-    game:+document.getElementById("sGame").value,
-    seats:+document.getElementById("sSeats").value,
-    price:+document.getElementById("sPrice").value,
-    seller, buyer
-  });
-  saveSales(); renderSales(); renderSettle();
-});
-
-// ---------- Init ----------
 (async()=>{
-  await load();
-  renderSchedule(); renderDraft(); renderFairness(); fillSelects(); renderSales(); renderSettle();
-  const pill=document.getElementById("syncPill");
-  if(pill) pill.innerHTML = CLOUD
-    ? "Synced with Greg, Benoit &amp; Sam"
-    : "<b>Local mode</b> — add your Supabase keys to sync across families";
+  await load(); renderAll();
+  const p=document.getElementById("syncPill");
+  p.innerHTML=CLOUD?"Synced with Greg, Benoit &amp; Sam"
+    :"<b>Local mode</b> — add your Supabase keys to sync across families";
 })();
 </script>
 </body>
