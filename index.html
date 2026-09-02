@@ -133,60 +133,93 @@
   @media(max-width:760px){
     .wrap{padding:0 14px 70px}
     header.board{padding:22px 18px 20px;border-radius:0 0 16px 16px;margin-bottom:18px}
-    h1{font-size:1.45rem}
-    .sub{font-size:.83rem}
-    .whobar button{flex:1;min-width:0;padding:10px 6px;text-align:center}
-    /* tabs scroll sideways instead of wrapping into a tall block */
+    h1{font-size:1.5rem;margin:6px 0 6px}
+    .sub{font-size:.84rem;line-height:1.45}
+    .whobar{gap:7px}
+    .whobar button{flex:1;min-width:0;padding:11px 6px;text-align:center}
     .tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
-      scrollbar-width:none;margin-left:-18px;margin-right:-18px;padding:0 18px}
+      scrollbar-width:none;margin:16px -18px 0;padding:0 18px}
     .tabs::-webkit-scrollbar{display:none}
-    .tab{flex:0 0 auto;padding:10px 14px}
+    .tab{flex:0 0 auto;padding:10px 15px}
 
     .fair,.settle{grid-template-columns:1fr;gap:10px}
+    .fcard{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px}
+    .fcard .fam{margin:0}
+    .fcard .big{font-size:1.6rem}
+    .fcard .lil{margin-top:0;text-align:right}
 
-    /* tables become stacked cards */
+    /* tables → cards */
     table,thead,tbody,tr,td{display:block;width:100%}
     thead{display:none}
     table{border:none;background:none;border-radius:0}
     tr{background:var(--card);border:1px solid var(--line);border-radius:14px;
-      padding:12px 14px;margin-bottom:10px}
-    tr.shared{background:var(--all-soft);border-color:#C2D2E5}
-    td{border:none;padding:3px 0;display:flex;justify-content:space-between;
-      align-items:center;gap:12px;text-align:right}
-    td::before{content:attr(data-l);font-size:.72rem;font-weight:700;color:var(--muted);
-      text-align:left;flex:0 0 auto}
-    td:not([data-l])::before{content:none}
-    td .note{text-align:right}
-    /* game number sits as a small header line */
-    .c-num{display:none}
-    .gnum{display:inline}
-    .c-when{font-weight:700}
-    .c-act{justify-content:flex-end;padding-top:10px;margin-top:8px;border-top:1px solid var(--line)}
-    .c-act:empty{display:none}
-    .c-act button{width:100%;padding:10px}
-    select.assign{min-width:130px;padding:9px 10px}
+      padding:14px 16px;margin-bottom:10px}
+    td{border:none;padding:0;text-align:left}
+    td::before{content:none}
 
-    /* draft + offer rows stack */
-    .dgame,.ogame{flex-direction:column;align-items:stretch;gap:10px;padding:13px 14px}
-    .dpick{width:100%}
-    .dpick button{flex:1;padding:11px 6px;font-size:.82rem}
+    /* — schedule card: no labels needed, content is self-evident — */
+    #schedBody tr{display:grid;grid-template-columns:1fr auto;
+      grid-template-areas:"when status" "opp opp" "owner owner" "act act";
+      gap:3px 10px;align-items:start}
+    #schedBody tr.shared{background:var(--all-soft);border-color:#C2D2E5}
+    #schedBody .c-num{display:none}
+    #schedBody .c-when{grid-area:when;font-weight:800;font-size:.95rem}
+    #schedBody .c-when .note{display:inline;color:var(--muted)}
+    #schedBody .c-st{grid-area:status;justify-self:end}
+    #schedBody .c-opp{grid-area:opp;font-size:1.02rem;font-weight:700;line-height:1.3}
+    #schedBody .c-opp .note{font-size:.76rem;margin-top:1px}
+    #schedBody .gnum{display:inline}
+    #schedBody .c-own{grid-area:owner;margin-top:9px}
+    #schedBody .c-own select{width:100%;padding:11px 10px;font-size:.88rem}
+    #schedBody .c-act{grid-area:act;margin-top:8px}
+    #schedBody .c-act:empty{display:none}
+    #schedBody .c-act button{width:100%;padding:11px}
+
+    /* — sales card: labels above values, left aligned — */
+    #saleBody tr{display:grid;grid-template-columns:repeat(3,1fr);
+      grid-template-areas:"game game game" "seats price amount" "sell sell buy" "act act act";
+      gap:10px 12px}
+    #saleBody td[data-l]::before{content:attr(data-l);display:block;font-size:.66rem;
+      text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:2px}
+    #saleBody td:nth-child(1){display:none}
+    #saleBody td:nth-child(2){grid-area:game;font-weight:700;font-size:.95rem}
+    #saleBody td:nth-child(3){grid-area:seats}
+    #saleBody td:nth-child(4){grid-area:price}
+    #saleBody td:nth-child(5){grid-area:amount}
+    #saleBody td:nth-child(6){grid-area:sell}
+    #saleBody td:nth-child(7){grid-area:buy}
+    #saleBody td:nth-child(8){grid-area:act}
+    #saleBody td:nth-child(8) button{width:100%;padding:10px}
+    #saleBody td.empty{display:block;grid-area:unset}
+    #saleBody tr.emptyrow{display:block}
+    #saleBody tr.emptyrow td{display:block}
+    #saleBody tr.emptyrow td::before{content:none}
+
+    /* draft + offer rows */
+    .dgame,.ogame{flex-direction:column;align-items:stretch;gap:11px;padding:14px 16px}
+    .g-opp{font-size:.97rem}
+    .dpick{width:100%;gap:7px}
+    .dpick button{flex:1;padding:12px 6px;font-size:.83rem}
     .dpick button.allbtn{flex-basis:100%}
     #draftTotals{width:100%;justify-content:space-around;order:3;
       padding-top:12px;border-top:1px solid var(--line)}
-    #resetDraft{order:2}
+    #resetDraft{order:2;width:100%}
 
-    /* form fields full width */
-    .row{gap:10px}
+    .row{gap:11px}
     .field{flex:1 1 100%}
-    .field.sm{flex:1 1 calc(50% - 5px)}
+    .field.sm{flex:1 1 calc(50% - 6px)}
     .field.sm input{width:100%}
+    .field input,.field select{padding:11px 10px}
     .row button.act{width:100%;padding:13px}
     .card{padding:15px}
     h2.sec{font-size:1rem}
+    .sharedbox{padding:14px 16px}
   }
   @media(max-width:380px){
-    .whobar button{font-size:.75rem;padding:9px 4px}
-    .dpick button{font-size:.78rem;padding:10px 4px}
+    .whobar button{font-size:.76rem;padding:10px 4px}
+    .dpick button{font-size:.79rem;padding:11px 3px}
+    #saleBody tr{grid-template-columns:repeat(2,1fr);
+      grid-template-areas:"game game" "seats price" "amount amount" "sell buy" "act act"}
   }
 </style>
 </head>
@@ -598,7 +631,7 @@ function fillSelects(){
 }
 function renderSales(){
   const tb=document.getElementById("saleBody"); tb.innerHTML="";
-  if(!sales.length) tb.innerHTML=`<tr><td colspan="8" class="empty">No sales logged yet.</td></tr>`;
+  if(!sales.length) tb.innerHTML=`<tr class="emptyrow"><td colspan="8" class="empty">No sales logged yet.</td></tr>`;
   sales.forEach(s=>{
     const g=games.find(x=>x.n===s.game);
     tb.insertAdjacentHTML("beforeend",
