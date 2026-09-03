@@ -70,6 +70,8 @@
   .time{color:var(--court);font-weight:800}
   .schooltag{font-size:.66rem;font-weight:800;background:#FDE7C7;color:#8a5a10;
     padding:2px 7px;border-radius:20px;margin-left:5px;white-space:nowrap}
+  .freetag{font-size:.66rem;font-weight:800;background:#DFF0E7;color:#1f6045;
+    padding:2px 7px;border-radius:20px;margin-left:5px;white-space:nowrap}
   .biggame{font-size:.66rem;font-weight:800;background:#F7D9CC;color:#9A3B12;
     padding:2px 7px;border-radius:20px;margin-left:5px;white-space:nowrap}
 
@@ -228,7 +230,7 @@
   <div class="wrap" style="padding:0">
     <div class="kick">MELBOURNE UNITED · JOHN CAIN ARENA</div>
     <h1>Shared Season Tickets <span class="season">26/27</span></h1>
-    <p class="sub">Sixteen home games, four seats, three families. One night is all of us together; the other fifteen split five each.</p>
+    <p class="sub">Fourteen home games at John Cain Arena, four seats, three families. Two nights we all go together; the other twelve split four each.</p>
     <div class="whobar">
       <span>You are:</span>
       <button data-me="Greg">Greg</button>
@@ -267,7 +269,7 @@
 
   <section id="draft">
     <h2 class="sec">Run the draft</h2>
-    <p class="note" style="margin:-4px 0 14px">Snake order: 1-2-3, then 3-2-1, repeating. Five games each, plus one night everyone goes together.</p>
+    <p class="note" style="margin:-4px 0 14px">Snake order: 1-2-3, then 3-2-1, repeating. Four games each, plus two nights everyone goes together.</p>
     <div class="card" style="padding:15px 18px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
         <div><div class="note" style="font-weight:700">On the clock</div>
@@ -286,7 +288,7 @@
     <div id="balanceMsg" class="balance ok"></div>
     <div id="sharedNote"></div>
     <div class="fair" id="fairCards"></div>
-    <p class="note" style="margin-top:10px">Five games each is the target. The breakdown shows what kind of nights they are, since a Sunday afternoon and a Thursday school night aren't the same thing with kids.</p>
+    <p class="note" style="margin-top:10px">Four games each is the target. The breakdown shows what kind of nights they are, since a Sunday afternoon and a Thursday school night aren't the same thing with kids.</p>
   </section>
 
   <section id="sales">
@@ -329,22 +331,20 @@ const HUE = {Greg:"var(--a)",Benoit:"var(--b)",Sam:"var(--c)",Everyone:"var(--al
 let ME = null;
 
 const DEFAULT_GAMES = [
-  {n:1, day:"Sat",date:"19 Sep",time:"7:30pm",school:false,opp:"Adelaide 36ers",note:"Opening Night — Ingles debut",big:true, owner:ALL},
-  {n:2, day:"Thu",date:"24 Sep",time:"7:30pm",school:true, opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Benoit"},
-  {n:3, day:"Sat",date:"03 Oct",time:"7:30pm",school:false,opp:"Cairns Taipans",note:"",big:false,owner:"Sam"},
-  {n:4, day:"Sat",date:"10 Oct",time:"7:30pm",school:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Greg"},
-  {n:5, day:"Sun",date:"18 Oct",time:"5:00pm",school:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Sam"},
-  {n:6, day:"Sun",date:"25 Oct",time:"5:00pm",school:false,opp:"Sydney Kings",note:"",big:true, owner:"Benoit"},
-  {n:7, day:"Mon",date:"02 Nov",time:"7:30pm",school:true, opp:"NZ Breakers",note:"",big:false,owner:"Benoit"},
-  {n:8, day:"Sat",date:"07 Nov",time:"7:30pm",school:false,opp:"Brisbane Bullets",note:"",big:false,owner:"Greg"},
-  {n:9, day:"Sat",date:"14 Nov",time:"7:30pm",school:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Sam"},
-  {n:10,day:"Sat",date:"21 Nov",time:"7:30pm",school:false,opp:"NZ Breakers",note:"",big:false,owner:"Sam"},
-  {n:11,day:"Sun",date:"06 Dec",time:"3:00pm",school:false,opp:"Brisbane Bullets",note:"earliest tip of the season",big:false,owner:"Greg"},
-  {n:12,day:"Sat",date:"12 Dec",time:"7:30pm",school:false,opp:"Tasmania JackJumpers",note:"",big:false,owner:"Benoit"},
-  {n:13,day:"Wed",date:"23 Dec",time:"8:00pm",school:false,opp:"Cairns Taipans",note:"school holidays",big:false,owner:"Sam"},
-  {n:14,day:"Sun",date:"07 Feb",time:"5:00pm",school:false,opp:"Perth Wildcats",note:"",big:true, owner:"Greg"},
-  {n:15,day:"Thu",date:"11 Feb",time:"7:30pm",school:true, opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Benoit"},
-  {n:16,day:"Sat",date:"13 Feb",time:"5:30pm",school:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Greg"},
+  {n:1, day:"Sat",date:"19 Sep",time:"7:30pm",school:false,freenight:false,opp:"Adelaide 36ers",note:"Opening Night — Ingles debut · school holidays",big:true, owner:ALL},
+  {n:2, day:"Sat",date:"03 Oct",time:"7:30pm",school:false,freenight:false,opp:"Cairns Taipans",note:"school holidays",big:false,owner:"Greg"},
+  {n:3, day:"Sun",date:"18 Oct",time:"5:00pm",school:false,freenight:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Benoit"},
+  {n:4, day:"Sun",date:"25 Oct",time:"5:00pm",school:false,freenight:false,opp:"Sydney Kings",note:"",big:true, owner:"Benoit"},
+  {n:5, day:"Mon",date:"02 Nov",time:"7:30pm",school:false,freenight:true, opp:"NZ Breakers",note:"Cup Day eve — no school Tuesday",big:false,owner:"Sam"},
+  {n:6, day:"Sat",date:"07 Nov",time:"7:30pm",school:false,freenight:false,opp:"Brisbane Bullets",note:"",big:false,owner:"Sam"},
+  {n:7, day:"Sat",date:"14 Nov",time:"7:30pm",school:false,freenight:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Benoit"},
+  {n:8, day:"Sat",date:"21 Nov",time:"7:30pm",school:false,freenight:false,opp:"NZ Breakers",note:"",big:false,owner:"Greg"},
+  {n:9, day:"Sun",date:"06 Dec",time:"3:00pm",school:false,freenight:false,opp:"Brisbane Bullets",note:"earliest tip of the season",big:false,owner:ALL},
+  {n:10,day:"Sat",date:"12 Dec",time:"7:30pm",school:false,freenight:false,opp:"Tasmania JackJumpers",note:"",big:false,owner:"Benoit"},
+  {n:11,day:"Wed",date:"23 Dec",time:"8:00pm",school:false,freenight:true, opp:"Cairns Taipans",note:"school holidays",big:false,owner:"Sam"},
+  {n:12,day:"Sun",date:"07 Feb",time:"5:00pm",school:false,freenight:false,opp:"Perth Wildcats",note:"",big:true, owner:"Sam"},
+  {n:13,day:"Thu",date:"11 Feb",time:"7:30pm",school:true, freenight:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Greg"},
+  {n:14,day:"Sat",date:"13 Feb",time:"5:30pm",school:false,freenight:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Greg"},
 ].map(g=>({...g,drafted:true,status:"held"}));
 
 let games = [], sales = [], activity = [];
@@ -457,6 +457,7 @@ const owned=f=>games.filter(g=>g.owner===f&&g.drafted!==false);
 const sharedGames=()=>games.filter(g=>g.owner===ALL&&g.drafted!==false);
 const whenLine=g=>`${g.day} ${g.date} · <span class="time">${g.time}</span>`
   +(g.school?' <span class="schooltag">school night</span>':'')
+  +(g.freenight?' <span class="freetag">no school next day</span>':'')
   +(g.big?' <span class="biggame">big one</span>':'');
 function requireMe(){ if(!ME){ alert("Tap your name at the top first, so we know who's acting."); return false; } return true; }
 
@@ -475,7 +476,7 @@ function renderSchedule(){
     const tr=document.createElement("tr");
     if(isAll) tr.className="shared";
     tr.innerHTML=`<td class="c-num" data-l="Game">${g.n}</td>
-      <td class="c-when" data-l="When">${g.day} ${g.date}<div class="note"><span class="time">${g.time}</span>${g.school?' <span class="schooltag">school night</span>':''}</div></td>
+      <td class="c-when" data-l="When">${g.day} ${g.date}<div class="note"><span class="time">${g.time}</span>${g.school?' <span class="schooltag">school night</span>':''}${g.freenight?' <span class="freetag">no school next day</span>':''}</div></td>
       <td class="c-opp" data-l="Opponent"><span class="gnum">#${g.n}</span> ${g.opp}${g.big?' <span class="biggame">big one</span>':''}<div class="note">${g.note||""}</div></td>
       <td class="c-own" data-l="Owner"><select class="assign" data-n="${g.n}" style="border-color:${HUE[g.owner]}">${opts}</select></td>
       <td class="c-st" data-l="Status">${st}</td><td class="c-act">${act}</td>`;
