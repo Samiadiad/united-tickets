@@ -67,6 +67,17 @@
   .statustag{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
   .st-held{background:#EFEFEA;color:var(--muted)}
   .st-offered{background:#FDE7C7;color:#8a5a10}
+  .st-spare{background:#DCE6F2;color:var(--all)}
+  .sparepill{display:inline-block;font-size:.66rem;font-weight:800;background:#DCE6F2;color:var(--all);
+    padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .wholetag{display:inline-block;font-size:.66rem;font-weight:800;background:#FDE7C7;color:#8a5a10;
+    padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .whoson{margin-top:5px;display:flex;gap:4px;flex-wrap:wrap}
+  .ogame.spare{border-left-color:var(--all)}
+  select.seatsel{border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;
+    font-size:.8rem;font-weight:700;background:#fff}
+  select.sparesel{border:1px solid var(--line);border-radius:8px;padding:5px 7px;font:inherit;
+    font-size:.72rem;font-weight:600;background:#fff;color:var(--ink-soft);margin-top:5px}
   .time{color:var(--court);font-weight:800}
   .schooltag{font-size:.66rem;font-weight:800;background:#FDE7C7;color:#8a5a10;
     padding:2px 7px;border-radius:20px;margin-left:5px;white-space:nowrap}
@@ -177,25 +188,23 @@
     #schedBody .c-act:empty{display:none}
     #schedBody .c-act button{width:100%;padding:11px}
 
-    /* — sales card: labels above values, left aligned — */
-    #saleBody tr{display:grid;grid-template-columns:repeat(3,1fr);
-      grid-template-areas:"game game game" "seats price amount" "sell sell buy" "act act act";
-      gap:10px 12px}
-    #saleBody td[data-l]::before{content:attr(data-l);display:block;font-size:.66rem;
+    /* — swap ledger card: labels above values — */
+    #moveBody tr{display:grid;grid-template-columns:auto 1fr 1fr;
+      grid-template-areas:"game game game" "seats from to" "act act act";
+      gap:10px 12px;align-items:end}
+    #moveBody td[data-l]::before{content:attr(data-l);display:block;font-size:.66rem;
       text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:2px}
-    #saleBody td:nth-child(1){display:none}
-    #saleBody td:nth-child(2){grid-area:game;font-weight:700;font-size:.95rem}
-    #saleBody td:nth-child(3){grid-area:seats}
-    #saleBody td:nth-child(4){grid-area:price}
-    #saleBody td:nth-child(5){grid-area:amount}
-    #saleBody td:nth-child(6){grid-area:sell}
-    #saleBody td:nth-child(7){grid-area:buy}
-    #saleBody td:nth-child(8){grid-area:act}
-    #saleBody td:nth-child(8) button{width:100%;padding:10px}
-    #saleBody td.empty{display:block;grid-area:unset}
-    #saleBody tr.emptyrow{display:block}
-    #saleBody tr.emptyrow td{display:block}
-    #saleBody tr.emptyrow td::before{content:none}
+    #moveBody td:nth-child(1){display:none}
+    #moveBody td:nth-child(2){grid-area:game;font-weight:700;font-size:.95rem}
+    #moveBody td:nth-child(3){grid-area:seats}
+    #moveBody td:nth-child(4){grid-area:from}
+    #moveBody td:nth-child(5){grid-area:to}
+    #moveBody td:nth-child(6){grid-area:act}
+    #moveBody td:nth-child(6) button{width:100%;padding:10px}
+    #moveBody td.empty{display:block;grid-area:unset}
+    #moveBody tr.emptyrow{display:block}
+    #moveBody tr.emptyrow td{display:block}
+    #moveBody tr.emptyrow td::before{content:none}
 
     /* draft + offer rows */
     .dgame,.ogame{flex-direction:column;align-items:stretch;gap:11px;padding:14px 16px}
@@ -220,8 +229,8 @@
   @media(max-width:380px){
     .whobar button{font-size:.76rem;padding:10px 4px}
     .dpick button{font-size:.79rem;padding:11px 3px}
-    #saleBody tr{grid-template-columns:repeat(2,1fr);
-      grid-template-areas:"game game" "seats price" "amount amount" "sell buy" "act act"}
+    #moveBody tr{grid-template-columns:1fr 1fr;
+      grid-template-areas:"game game" "seats seats" "from to" "act act"}
   }
 </style>
 </head>
@@ -242,7 +251,7 @@
       <button class="tab" data-t="available">Up for grabs<span class="badge" id="availBadge">0</span></button>
       <button class="tab" data-t="draft">Draft</button>
       <button class="tab" data-t="fairness">Fairness</button>
-      <button class="tab" data-t="sales">Sales &amp; settle</button>
+      <button class="tab" data-t="ledger">Seat balance</button>
     </div>
     <div id="syncPill" class="syncpill"></div>
   </div>
@@ -291,27 +300,29 @@
     <p class="note" style="margin-top:10px">Four games each is the target. The breakdown shows what kind of nights they are, since a Sunday afternoon and a Thursday school night aren't the same thing with kids.</p>
   </section>
 
-  <section id="sales">
-    <h2 class="sec">Log a seat sale</h2>
+  <section id="ledger">
+    <h2 class="sec">Seat balance</h2>
+    <p class="note" style="margin:-4px 0 14px">Every time seats change hands it's logged here. Positive means you've used more than your share, negative means you've given more away. Square up at the end of the season or just call it even — your call.</p>
+    <div class="settle" id="balanceCards"></div>
+    <p class="note" id="balanceNote" style="text-align:center;margin-top:12px"></p>
+
+    <h2 class="sec" style="margin-top:26px">Log a swap by hand</h2>
     <div class="card">
       <div class="row">
-        <div class="field"><label>Game</label><select id="sGame"></select></div>
-        <div class="field sm"><label>Seats</label><input id="sSeats" type="number" min="1" max="4" value="2"></div>
-        <div class="field sm"><label>$ / seat</label><input id="sPrice" type="number" min="0" value="30"></div>
-        <div class="field"><label>Seller (gets paid)</label><select id="sSeller"></select></div>
-        <div class="field"><label>Buyer (pays)</label><select id="sBuyer"></select></div>
-        <button class="act" id="addSale">Add sale</button>
+        <div class="field"><label>Game</label><select id="mGame"></select></div>
+        <div class="field sm"><label>Seats</label><input id="mSeats" type="number" min="1" max="4" value="2"></div>
+        <div class="field"><label>From (gave them up)</label><select id="mFrom"></select></div>
+        <div class="field"><label>To (used them)</label><select id="mTo"></select></div>
+        <button class="act" id="addMove">Log it</button>
       </div>
-      <p class="note" style="margin-top:10px">For money changing hands on individual seats. Handing over a whole game is done on "Up for grabs".</p>
+      <p class="note" style="margin-top:10px">Claims made on the "Up for grabs" tab are logged automatically — this is for anything sorted out in the group chat.</p>
     </div>
-    <h2 class="sec">Transactions</h2>
+
+    <h2 class="sec">Every swap this season</h2>
     <table>
-      <thead><tr><th>Logged</th><th>Game</th><th>Seats</th><th>$/seat</th><th>Amount</th><th>Seller</th><th>Buyer</th><th></th></tr></thead>
-      <tbody id="saleBody"></tbody>
+      <thead><tr><th>Logged</th><th>Game</th><th>Seats</th><th>From</th><th>To</th><th></th></tr></thead>
+      <tbody id="moveBody"></tbody>
     </table>
-    <h2 class="sec" style="margin-top:24px">Season settlement</h2>
-    <div class="settle" id="settleCards"></div>
-    <p class="note" id="settleCheck" style="text-align:center;margin-top:12px"></p>
   </section>
 </div>
 
@@ -347,7 +358,7 @@ const DEFAULT_GAMES = [
   {n:14,day:"Sat",date:"13 Feb",time:"5:30pm",school:false,freenight:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Greg"},
 ].map(g=>({...g,drafted:true,status:"held"}));
 
-let games = [], sales = [], activity = [];
+let games = [], moves = [], activity = [];
 
 // ---------- Persistence: one row per record ----------
 const CLOUD = !!(SUPABASE_URL && SUPABASE_KEY);
@@ -387,7 +398,8 @@ async function fetchAll(){
 // Only these fields live in the database. Fixture details (day, date, time,
 // opponent, note) always come from DEFAULT_GAMES above, so corrections to the
 // schedule flow through on the next page load without touching stored data.
-const stateOf = g => ({n:g.n, owner:g.owner, drafted:g.drafted, status:g.status});
+const stateOf = g => ({n:g.n, owner:g.owner, drafted:g.drafted, status:g.status,
+  spareSeats:g.spareSeats||0, claims:g.claims||[]});
 const VALID_OWNERS = [...FAMILIES, ALL];
 
 function applyRows(rows){
@@ -398,10 +410,16 @@ function applyRows(rows){
       state[d.n]={
         owner: VALID_OWNERS.includes(d.owner) ? d.owner : undefined,
         drafted: typeof d.drafted==="boolean" ? d.drafted : undefined,
-        status: ["held","offered"].includes(d.status) ? d.status : undefined
+        status: ["held","offered","spare"].includes(d.status) ? d.status : undefined,
+        spareSeats: typeof d.spareSeats==="number" ? d.spareSeats : undefined,
+        claims: Array.isArray(d.claims) ? d.claims : undefined
       };
     }
-    else if(r.kind==="sale") s.push(r.data);
+    else if(r.kind==="move"||r.kind==="sale"){
+      // older "sale" rows used seller/buyer (and a price we no longer track)
+      const d=r.data||{};
+      s.push({...d, from: d.from||d.seller, to: d.to||d.buyer});
+    }
     else if(r.kind==="activity") a.push(r.data);
   });
   // fixture from code + saved state from cloud
@@ -410,15 +428,17 @@ function applyRows(rows){
     return {...base,
       ...(st.owner!==undefined?{owner:st.owner}:{}),
       ...(st.drafted!==undefined?{drafted:st.drafted}:{}),
-      ...(st.status!==undefined?{status:st.status}:{})};
+      ...(st.status!==undefined?{status:st.status}:{}),
+      ...(st.spareSeats!==undefined?{spareSeats:st.spareSeats}:{}),
+      ...(st.claims!==undefined?{claims:st.claims}:{})};
   });
-  sales=s.sort((x,y)=>(y.ts||0)-(x.ts||0));
+  moves=s.sort((x,y)=>(y.ts||0)-(x.ts||0));
   activity=a.sort((x,y)=>(y.ts||0)-(x.ts||0)).slice(0,40);
 }
-const snapshot=()=>JSON.stringify({games,sales,activity});
+const snapshot=()=>JSON.stringify({games,moves,activity});
 
 async function load(){
-  games=structuredClone(DEFAULT_GAMES); sales=[]; activity=[];
+  games=structuredClone(DEFAULT_GAMES); moves=[]; activity=[];
   if(CLOUD){
     try{
       const rows=await fetchAll();
@@ -440,7 +460,7 @@ function startPolling(){
   },4000);
 }
 async function saveGame(g){ const ok=await putRow("game",g.n,stateOf(g)); if(ok){lastSnapshot=snapshot(); flash("Saved ✓");} return ok; }
-async function saveSale(s){ const ok=await putRow("sale",s.id,s); if(ok) lastSnapshot=snapshot(); return ok; }
+async function saveMove(m){ const ok=await putRow("move",m.id,m); if(ok) lastSnapshot=snapshot(); return ok; }
 async function logActivity(text){
   const i={id:uid(),ts:Date.now(),text,when:new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short"})};
   activity.unshift(i); await putRow("activity",i.id,i); lastSnapshot=snapshot();
@@ -453,8 +473,36 @@ function flash(msg){
 }
 
 // ---------- Helpers ----------
+const SEATS=4;
 const owned=f=>games.filter(g=>g.owner===f&&g.drafted!==false);
 const sharedGames=()=>games.filter(g=>g.owner===ALL&&g.drafted!==false);
+const claimedSeats=g=>(g.claims||[]).reduce((s,c)=>s+c.seats,0);
+const spareLeft=g=>g.status==="spare"?Math.max(0,(g.spareSeats||0)-claimedSeats(g)):0;
+// who's actually going, and with how many seats
+function attendees(g){
+  const list=[];
+  if(g.status==="spare"){
+    const own=SEATS-(g.spareSeats||0);
+    if(own>0) list.push({by:g.owner,seats:own});
+    (g.claims||[]).forEach(c=>list.push({by:c.by,seats:c.seats}));
+    const left=spareLeft(g);
+    if(left>0) list.push({by:"spare",seats:left});
+  }else if(g.owner!==ALL){
+    list.push({by:g.owner,seats:SEATS});
+  }
+  return list;
+}
+// record seats changing hands
+async function recordMove(game,seats,from,to,kind){
+  if(!(seats>0)||from===to||to===ALL) return null;
+  const m={id:uid(),ts:Date.now(),
+    date:new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short"}),
+    game,seats,from,to,kind};
+  moves.unshift(m); await saveMove(m); return m;
+}
+const attendLine=g=>attendees(g).map(a=>
+  a.by==="spare"?`<span class="sparepill">${a.seats} spare</span>`
+  :`<span class="chip chip${a.by}">${a.by} ${a.seats}</span>`).join(" ");
 const whenLine=g=>`${g.day} ${g.date} · <span class="time">${g.time}</span>`
   +(g.school?' <span class="schooltag">school night</span>':'')
   +(g.freenight?' <span class="freetag">no school next day</span>':'')
@@ -467,19 +515,32 @@ function renderSchedule(){
   games.forEach(g=>{
     const opts=[...FAMILIES,ALL].map(f=>`<option ${f===g.owner?"selected":""}>${f}</option>`).join("");
     const isAll=g.owner===ALL;
-    const st=isAll?`<span class="statustag st-held">All together</span>`
-      :g.status==="offered"?`<span class="statustag st-offered">Up for grabs</span>`
-      :`<span class="statustag st-held">Held</span>`;
-    const act=isAll?"":(g.status==="offered"
-      ?`<button class="ghost tiny" data-un="${g.n}">Cancel offer</button>`
-      :`<button class="ghost tiny" data-cant="${g.n}">Can't go</button>`);
+    let st;
+    if(isAll) st=`<span class="statustag st-held">All together</span>`;
+    else if(g.status==="offered") st=`<span class="statustag st-offered">Whole game up for grabs</span>`;
+    else if(g.status==="spare") st=spareLeft(g)>0
+        ? `<span class="statustag st-spare">${spareLeft(g)} seat${spareLeft(g)>1?"s":""} spare</span>`
+        : `<span class="statustag st-held">All 4 seats taken</span>`;
+    else st=`<span class="statustag st-held">Held · all 4 seats</span>`;
+
+    let act="";
+    if(!isAll){
+      if(g.status==="offered") act=`<button class="ghost tiny" data-un="${g.n}">Cancel offer</button>`;
+      else if(g.status==="spare") act=`<button class="ghost tiny" data-un="${g.n}">Cancel spare seats</button>`;
+      else act=`<button class="ghost tiny" data-cant="${g.n}">Can't go at all</button>
+        <select class="sparesel tiny" data-n="${g.n}">
+          <option value="">Spare seats…</option>
+          <option value="1">1 spare</option><option value="2">2 spare</option><option value="3">3 spare</option>
+        </select>`;
+    }
+    const who=isAll?"":`<div class="whoson">${attendLine(g)}</div>`;
     const tr=document.createElement("tr");
     if(isAll) tr.className="shared";
     tr.innerHTML=`<td class="c-num" data-l="Game">${g.n}</td>
       <td class="c-when" data-l="When">${g.day} ${g.date}<div class="note"><span class="time">${g.time}</span>${g.school?' <span class="schooltag">school night</span>':''}${g.freenight?' <span class="freetag">no school next day</span>':''}</div></td>
       <td class="c-opp" data-l="Opponent"><span class="gnum">#${g.n}</span> ${g.opp}${g.big?' <span class="biggame">big one</span>':''}<div class="note">${g.note||""}</div></td>
       <td class="c-own" data-l="Owner"><select class="assign" data-n="${g.n}" style="border-color:${HUE[g.owner]}">${opts}</select></td>
-      <td class="c-st" data-l="Status">${st}</td><td class="c-act">${act}</td>`;
+      <td class="c-st" data-l="Status">${st}${who}</td><td class="c-act">${act}</td>`;
     tb.appendChild(tr);
   });
   tb.querySelectorAll("select.assign").forEach(s=>s.addEventListener("change",async e=>{
@@ -493,13 +554,26 @@ function renderSchedule(){
     const g=games.find(x=>x.n==e.target.dataset.cant);
     if(!requireMe()) return;
     if(ME!==g.owner && !confirm(`That game belongs to ${g.owner}, not you. Offer it anyway?`)) return;
-    g.status="offered"; await saveGame(g);
-    await logActivity(`${ME} can't make #${g.n} ${g.opp} (${g.day} ${g.date}, ${g.time}) — up for grabs`);
+    if(!confirm(`Give up #${g.n} ${g.opp} entirely?\n\nAll 4 seats go up for grabs. Whoever takes it becomes the owner and it counts toward their four instead of yours.`)) return;
+    g.status="offered"; g.spareSeats=0; g.claims=[]; await saveGame(g);
+    await logActivity(`${ME} can't make #${g.n} ${g.opp} (${g.day} ${g.date}) — whole game up for grabs`);
     renderAll(); alert(`#${g.n} ${g.opp} is up for grabs. Give the others a nudge in the group chat too.`);
+  }));
+  tb.querySelectorAll("select.sparesel").forEach(s=>s.addEventListener("change",async e=>{
+    const n=+e.target.dataset.n, seats=+e.target.value;
+    if(!seats){ return; }
+    const g=games.find(x=>x.n===n);
+    if(!requireMe()){ e.target.value=""; return; }
+    if(ME!==g.owner && !confirm(`That game belongs to ${g.owner}, not you. Offer spare seats anyway?`)){ e.target.value=""; return; }
+    g.status="spare"; g.spareSeats=seats; g.claims=g.claims||[];
+    await saveGame(g);
+    await logActivity(`${ME} has ${seats} spare seat${seats>1?"s":""} for #${g.n} ${g.opp} (${g.day} ${g.date}) — still going`);
+    renderAll();
   }));
   tb.querySelectorAll("[data-un]").forEach(b=>b.addEventListener("click",async e=>{
     const g=games.find(x=>x.n==e.target.dataset.un);
-    g.status="held"; await saveGame(g);
+    if(claimedSeats(g)>0 && !confirm(`${claimedSeats(g)} seat(s) already claimed. Cancel anyway and clear those claims?`)) return;
+    g.status="held"; g.spareSeats=0; g.claims=[]; await saveGame(g);
     await logActivity(`Offer withdrawn on #${g.n} ${g.opp}`); renderAll();
   }));
 }
@@ -507,29 +581,76 @@ function renderSchedule(){
 // ---------- Up for grabs ----------
 function renderAvailable(){
   const list=document.getElementById("availList"); list.innerHTML="";
-  const off=games.filter(g=>g.status==="offered"&&g.owner!==ALL);
+  const whole=games.filter(g=>g.status==="offered"&&g.owner!==ALL);
+  const spare=games.filter(g=>g.status==="spare"&&spareLeft(g)>0);
+  const total=whole.length+spare.length;
   const b=document.getElementById("availBadge");
-  b.textContent=off.length; b.classList.toggle("show",off.length>0);
-  if(!off.length) list.innerHTML=`<div class="empty">Nothing up for grabs. If you can't make one of yours, hit "Can't go" on the Schedule tab.</div>`;
-  off.forEach(g=>{
+  b.textContent=total; b.classList.toggle("show",total>0);
+
+  if(!total) list.innerHTML=`<div class="empty">Nothing going spare. If you can't make one of yours — or have seats free — use the buttons on the Schedule tab.</div>`;
+
+  // whole games
+  whole.forEach(g=>{
     const others=FAMILIES.filter(f=>f!==g.owner);
     list.insertAdjacentHTML("beforeend",
       `<div class="ogame"><div class="g-meta">
-        <div class="g-opp">#${g.n} · ${g.opp}</div>
-        <div class="g-sub">${whenLine(g)} · offered by <b>${g.owner}</b></div></div>
-        <div class="dpick">${others.map(f=>`<button data-claim="${g.n}" data-by="${f}">${f} takes it</button>`).join("")}
+        <div class="g-opp">#${g.n} · ${g.opp} <span class="wholetag">whole game · 4 seats</span></div>
+        <div class="g-sub">${whenLine(g)} · <b>${g.owner}</b> can't make it</div></div>
+        <div class="dpick">
+          ${others.map(f=>`<button data-claim="${g.n}" data-by="${f}">${f} takes it</button>`).join("")}
           <button class="allbtn" data-claim="${g.n}" data-by="${ALL}">All together</button></div></div>`);
   });
+
+  // spare seats
+  spare.forEach(g=>{
+    const left=spareLeft(g);
+    const others=FAMILIES.filter(f=>f!==g.owner);
+    const seatOpts=Array.from({length:left},(_,i)=>i+1)
+      .map(k=>`<option value="${k}" ${k===left?"selected":""}>${k} seat${k>1?"s":""}</option>`).join("");
+    list.insertAdjacentHTML("beforeend",
+      `<div class="ogame spare"><div class="g-meta">
+        <div class="g-opp">#${g.n} · ${g.opp} <span class="sparepill">${left} seat${left>1?"s":""} spare</span></div>
+        <div class="g-sub">${whenLine(g)} · <b>${g.owner}</b> is going, ${left} seat${left>1?"s":""} free</div>
+        <div class="g-sub" style="margin-top:4px">${attendLine(g)}</div></div>
+        <div class="dpick">
+          <select class="seatsel" data-n="${g.n}">${seatOpts}</select>
+          ${others.map(f=>`<button data-take="${g.n}" data-by="${f}">${f}</button>`).join("")}
+        </div></div>`);
+  });
+
+  // claim a whole game (ownership transfers)
   list.querySelectorAll("[data-claim]").forEach(btn=>btn.addEventListener("click",async e=>{
     const n=+e.target.dataset.claim, by=e.target.dataset.by;
     const g=games.find(x=>x.n===n), from=g.owner;
     const msg=by===ALL
-      ? `Make #${n} ${g.opp} an all-together night?\n\nIt stops counting toward anyone's five.`
-      : `${by} takes #${n} ${g.opp} (${g.day} ${g.date}, ${g.time}).\n\n${from} gives it up; it counts toward ${by}'s five instead.`;
+      ? `Make #${n} ${g.opp} an all-together night?\n\nIt stops counting toward anyone's four.`
+      : `${by} takes #${n} ${g.opp} (${g.day} ${g.date}, ${g.time}) — all 4 seats.\n\n${from} gives it up; it counts toward ${by}'s four instead.\n\nLogged as 4 seats ${from} → ${by}.`;
     if(!confirm(msg)) return;
-    g.owner=by; g.status="held"; g.drafted=true;
-    await saveGame(g); await logActivity(`#${g.n} ${g.opp}: ${from} → ${by}`); renderAll();
+    const prevOwner=from;
+    g.owner=by; g.status="held"; g.spareSeats=0; g.claims=[]; g.drafted=true;
+    await saveGame(g);
+    if(by!==ALL) await recordMove(g.n,SEATS,prevOwner,by,"game");
+    await logActivity(`#${g.n} ${g.opp}: whole game ${from} → ${by}`);
+    renderAll();
   }));
+
+  // take some spare seats (owner keeps the game)
+  list.querySelectorAll("[data-take]").forEach(btn=>btn.addEventListener("click",async e=>{
+    const n=+e.target.dataset.take, by=e.target.dataset.by;
+    const g=games.find(x=>x.n===n);
+    const sel=document.querySelector(`select.seatsel[data-n="${n}"]`);
+    const want=Math.min(+sel.value||1, spareLeft(g));
+    if(want<1) return;
+    if(!confirm(`${by} takes ${want} seat${want>1?"s":""} for #${n} ${g.opp} (${g.day} ${g.date}, ${g.time}).\n\n${g.owner} is still going and keeps the game.\n\nLogged as ${want} seat${want>1?"s":""} ${g.owner} → ${by}.`)) return;
+    g.claims=g.claims||[];
+    const ex=g.claims.find(c=>c.by===by);
+    if(ex) ex.seats+=want; else g.claims.push({by,seats:want});
+    await saveGame(g);
+    await recordMove(g.n,want,g.owner,by,"seats");
+    await logActivity(`#${g.n} ${g.opp}: ${by} took ${want} spare seat${want>1?"s":""} from ${g.owner}`);
+    renderAll();
+  }));
+
   const log=document.getElementById("activityLog");
   log.innerHTML=activity.length
     ? activity.map(a=>`<div class="log"><b>${a.when}</b> · ${a.text}</div>`).join("")
@@ -624,63 +745,75 @@ function renderFairness(){
     : "";
 }
 
-// ---------- Sales ----------
+// ---------- Seat balance ----------
 function fillSelects(){
-  document.getElementById("sGame").innerHTML=games.map(g=>`<option value="${g.n}">#${g.n} · ${g.day} ${g.date} ${g.time} · ${g.opp}</option>`).join("");
-  ["sSeller","sBuyer"].forEach(id=>document.getElementById(id).innerHTML=FAMILIES.map(f=>`<option>${f}</option>`).join(""));
-  document.getElementById("sBuyer").selectedIndex=1;
+  document.getElementById("mGame").innerHTML=games.map(g=>`<option value="${g.n}">#${g.n} · ${g.day} ${g.date} ${g.time} · ${g.opp}</option>`).join("");
+  ["mFrom","mTo"].forEach(id=>document.getElementById(id).innerHTML=FAMILIES.map(f=>`<option>${f}</option>`).join(""));
+  document.getElementById("mTo").selectedIndex=1;
 }
-function renderSales(){
-  const tb=document.getElementById("saleBody"); tb.innerHTML="";
-  if(!sales.length) tb.innerHTML=`<tr class="emptyrow"><td colspan="8" class="empty">No sales logged yet.</td></tr>`;
-  sales.forEach(s=>{
-    const g=games.find(x=>x.n===s.game);
+function seatBalance(){
+  const b={}; FAMILIES.forEach(f=>b[f]={given:0,got:0});
+  moves.forEach(m=>{
+    const seats=m.seats||0;
+    if(b[m.from]) b[m.from].given+=seats;
+    if(b[m.to])   b[m.to].got+=seats;
+  });
+  return b;
+}
+function renderBalance(){
+  const b=seatBalance();
+  const box=document.getElementById("balanceCards"); box.innerHTML=""; let sum=0, any=false;
+  FAMILIES.forEach(f=>{
+    const net=b[f].got-b[f].given; sum+=net;
+    if(b[f].got||b[f].given) any=true;
+    const cls=net>0?"owes":net<0?"owed":"even";
+    const verdict=net>0?`used ${net} extra seat${net>1?"s":""}`
+      :net<0?`gave up ${-net} seat${net<-1?"s":""}`:"all square";
+    box.insertAdjacentHTML("beforeend",
+      `<div class="scard"><div style="font-weight:800"><span class="dot" style="background:${HUE[f]}"></span>${f}</div>
+        <div class="net ${cls}">${net>0?"+":net<0?"−":""}${Math.abs(net)}</div>
+        <div style="font-size:.78rem;font-weight:700" class="${cls}">${verdict}</div>
+        <div class="note" style="margin-top:5px">gave ${b[f].given} · took ${b[f].got}</div></div>`);
+  });
+  document.getElementById("balanceNote").textContent = !any
+    ? "No seats have changed hands yet."
+    : (sum===0 ? "Balances out ✓ — every seat given was taken by someone." : "");
+}
+function renderMoves(){
+  const tb=document.getElementById("moveBody"); tb.innerHTML="";
+  if(!moves.length){ tb.innerHTML=`<tr class="emptyrow"><td colspan="6" class="empty">Nothing swapped yet.</td></tr>`; }
+  moves.forEach(m=>{
+    const g=games.find(x=>x.n===m.game);
     tb.insertAdjacentHTML("beforeend",
-      `<tr><td class="note" data-l="Logged">${s.date}</td><td data-l="Game">#${s.game} ${g?g.opp:""}</td>
-        <td data-l="Seats">${s.seats}</td><td data-l="$/seat">$${s.price}</td>
-        <td data-l="Amount" style="font-weight:700">$${s.seats*s.price}</td>
-        <td data-l="Seller"><span class="chip chip${s.seller}">${s.seller}</span></td>
-        <td data-l="Buyer"><span class="chip chip${s.buyer}">${s.buyer}</span></td>
-        <td class="c-act"><button class="ghost tiny" data-del="${s.id}">Remove</button></td></tr>`);
+      `<tr><td class="note" data-l="Logged">${m.date}</td>
+        <td data-l="Game">#${m.game} ${g?g.opp:""}${m.kind==="game"?' <span class="wholetag">whole game</span>':''}</td>
+        <td data-l="Seats" style="font-weight:700">${m.seats}</td>
+        <td data-l="From"><span class="chip chip${m.from}">${m.from}</span></td>
+        <td data-l="To"><span class="chip chip${m.to}">${m.to}</span></td>
+        <td class="c-act"><button class="ghost tiny" data-del="${m.id}">Remove</button></td></tr>`);
   });
   tb.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",async e=>{
-    const id=e.target.dataset.del, s=sales.find(x=>x.id===id);
-    if(!s) return;
-    if(!confirm(`Remove this record?\n\n${s.seats} seat(s) for game #${s.game}, $${s.seats*s.price} from ${s.buyer} to ${s.seller}.\n\nThis can't be undone.`)) return;
-    sales=sales.filter(x=>x.id!==id);
-    await delRow("sale",id); lastSnapshot=snapshot();
-    await logActivity(`Sale removed: #${s.game}, $${s.seats*s.price} ${s.buyer}→${s.seller}`);
+    const id=e.target.dataset.del, m=moves.find(x=>x.id===id);
+    if(!m) return;
+    if(!confirm(`Remove this record?\n\n${m.seats} seat(s) for game #${m.game}, ${m.from} → ${m.to}.\n\nThis can't be undone.`)) return;
+    moves=moves.filter(x=>x.id!==id);
+    await delRow("move",id); lastSnapshot=snapshot();
+    await logActivity(`Swap record removed: #${m.game}, ${m.seats} seat(s) ${m.from}→${m.to}`);
     renderAll();
   }));
 }
-function renderSettle(){
-  const net={}; FAMILIES.forEach(f=>net[f]={r:0,p:0});
-  sales.forEach(s=>{const a=s.seats*s.price; if(net[s.seller])net[s.seller].r+=a; if(net[s.buyer])net[s.buyer].p+=a;});
-  const box=document.getElementById("settleCards"); box.innerHTML=""; let sum=0;
-  FAMILIES.forEach(f=>{
-    const n=net[f].r-net[f].p; sum+=n;
-    const cls=n>0?"owed":n<0?"owes":"even";
-    const v=n>0?"the group owes them":n<0?"owes the group":"all square";
-    box.insertAdjacentHTML("beforeend",
-      `<div class="scard"><div style="font-weight:800"><span class="dot" style="background:${HUE[f]}"></span>${f}</div>
-        <div class="net ${cls}">${n<0?"−":""}$${Math.abs(n)}</div>
-        <div style="font-size:.78rem;font-weight:700" class="${cls}">${v}</div></div>`);
-  });
-  document.getElementById("settleCheck").textContent=sum===0
-    ? "Balances to zero ✓ — one round of payments clears it." : "Totals should net to zero.";
-}
-document.getElementById("addSale").addEventListener("click",async()=>{
-  const seller=document.getElementById("sSeller").value, buyer=document.getElementById("sBuyer").value;
-  if(seller===buyer){ alert("Seller and buyer must be different families."); return; }
-  const seats=+document.getElementById("sSeats").value, price=+document.getElementById("sPrice").value;
+document.getElementById("addMove").addEventListener("click",async()=>{
+  const from=document.getElementById("mFrom").value, to=document.getElementById("mTo").value;
+  if(from===to){ alert("Pick two different families."); return; }
+  const seats=+document.getElementById("mSeats").value;
   if(!(seats>0)){ alert("Enter at least one seat."); return; }
-  const s={id:uid(),ts:Date.now(),date:new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short"}),
-    game:+document.getElementById("sGame").value,seats,price,seller,buyer};
-  sales.unshift(s); await saveSale(s); renderAll(); flash("Saved ✓");
+  await recordMove(+document.getElementById("mGame").value,seats,from,to,"seats");
+  await logActivity(`Logged by hand: ${seats} seat(s) ${from} → ${to}`);
+  renderAll(); flash("Saved ✓");
 });
 
 // ---------- Shell ----------
-function renderAll(){ renderSchedule(); renderAvailable(); renderDraft(); renderFairness(); fillSelects(); renderSales(); renderSettle(); }
+function renderAll(){ renderSchedule(); renderAvailable(); renderDraft(); renderFairness(); fillSelects(); renderMoves(); renderBalance(); }
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>{
   document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));
   document.querySelectorAll("section").forEach(s=>s.classList.remove("on"));
