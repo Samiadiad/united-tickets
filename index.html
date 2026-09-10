@@ -72,6 +72,11 @@
     padding:2px 8px;border-radius:20px;white-space:nowrap}
   .wholetag{display:inline-block;font-size:.66rem;font-weight:800;background:#FDE7C7;color:#8a5a10;
     padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .alltag{display:inline-block;font-size:.66rem;font-weight:800;background:var(--all-soft);color:var(--all);
+    padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .ogame.shared{border-left-color:var(--all);background:#FBFCFE}
+  select.myseats{border:1px solid var(--all);border-radius:8px;padding:5px 8px;font:inherit;
+    font-size:.74rem;font-weight:700;background:#fff;color:var(--all);margin-top:5px}
   .whoson{margin-top:5px;display:flex;gap:4px;flex-wrap:wrap}
   .ogame.spare{border-left-color:var(--all)}
   select.seatsel{border:1px solid var(--line);border-radius:8px;padding:7px 8px;font:inherit;
@@ -302,7 +307,7 @@
 
   <section id="ledger">
     <h2 class="sec">Seat balance</h2>
-    <p class="note" style="margin:-4px 0 14px">Every time seats change hands it's logged here. Positive means you've used more than your share, negative means you've given more away. Square up at the end of the season or just call it even — your call.</p>
+    <p class="note" style="margin:-4px 0 14px">Your share is 4 seats on each of your own games, plus 1 seat on each all-together night. Positive means you've used more than that, negative means you've given seats away. Square up at the end of the season or just call it even — your call.</p>
     <div class="settle" id="balanceCards"></div>
     <p class="note" id="balanceNote" style="text-align:center;margin-top:12px"></p>
 
@@ -356,7 +361,9 @@ const DEFAULT_GAMES = [
   {n:12,day:"Sun",date:"07 Feb",time:"5:00pm",school:false,freenight:false,opp:"Perth Wildcats",note:"",big:true, owner:"Sam"},
   {n:13,day:"Thu",date:"11 Feb",time:"7:30pm",school:true, freenight:false,opp:"SE Melbourne Phoenix",note:"Throwdown",big:true, owner:"Greg"},
   {n:14,day:"Sat",date:"13 Feb",time:"5:30pm",school:false,freenight:false,opp:"Illawarra Hawks",note:"",big:false,owner:"Greg"},
-].map(g=>({...g,drafted:true,status:"held"}));
+].map(g=>({...g,drafted:true,status:"held",
+   // on an all-together night each family holds one seat; the 4th is unclaimed
+   claims: g.owner===ALL ? FAMILIES.map(f=>({by:f,seats:1})) : []}));
 
 let games = [], moves = [], activity = [];
 
@@ -477,21 +484,31 @@ const SEATS=4;
 const owned=f=>games.filter(g=>g.owner===f&&g.drafted!==false);
 const sharedGames=()=>games.filter(g=>g.owner===ALL&&g.drafted!==false);
 const claimedSeats=g=>(g.claims||[]).reduce((s,c)=>s+c.seats,0);
-const spareLeft=g=>g.status==="spare"?Math.max(0,(g.spareSeats||0)-claimedSeats(g)):0;
+const spareLeft=g=> g.owner===ALL
+  ? Math.max(0,SEATS-claimedSeats(g))
+  : (g.status==="spare"?Math.max(0,(g.spareSeats||0)-claimedSeats(g)):0);
 // who's actually going, and with how many seats
 function attendees(g){
   const list=[];
-  if(g.status==="spare"){
+  if(g.owner===ALL){
+    // shared night: nobody owns it, each family claims the seats they need
+    (g.claims||[]).filter(c=>c.seats>0).forEach(c=>list.push({by:c.by,seats:c.seats}));
+    const left=spareLeft(g);
+    if(left>0) list.push({by:"spare",seats:left});
+  }else if(g.status==="spare"){
     const own=SEATS-(g.spareSeats||0);
     if(own>0) list.push({by:g.owner,seats:own});
     (g.claims||[]).forEach(c=>list.push({by:c.by,seats:c.seats}));
     const left=spareLeft(g);
     if(left>0) list.push({by:"spare",seats:left});
-  }else if(g.owner!==ALL){
+  }else{
     list.push({by:g.owner,seats:SEATS});
   }
   return list;
 }
+// how many seats a given family has claimed on a game
+const mySeats=(g,f)=>((g.claims||[]).find(c=>c.by===f)||{}).seats||0;
+const SHARE_ON_SHARED=1;   // your own seat on an all-together night
 // record seats changing hands
 async function recordMove(game,seats,from,to,kind){
   if(!(seats>0)||from===to||to===ALL) return null;
@@ -516,7 +533,9 @@ function renderSchedule(){
     const opts=[...FAMILIES,ALL].map(f=>`<option ${f===g.owner?"selected":""}>${f}</option>`).join("");
     const isAll=g.owner===ALL;
     let st;
-    if(isAll) st=`<span class="statustag st-held">All together</span>`;
+    if(isAll) st=spareLeft(g)>0
+        ? `<span class="statustag st-spare">All together · ${spareLeft(g)} seat${spareLeft(g)>1?"s":""} free</span>`
+        : `<span class="statustag st-held">All together · full</span>`;
     else if(g.status==="offered") st=`<span class="statustag st-offered">Whole game up for grabs</span>`;
     else if(g.status==="spare") st=spareLeft(g)>0
         ? `<span class="statustag st-spare">${spareLeft(g)} seat${spareLeft(g)>1?"s":""} spare</span>`
@@ -524,7 +543,14 @@ function renderSchedule(){
     else st=`<span class="statustag st-held">Held · all 4 seats</span>`;
 
     let act="";
-    if(!isAll){
+    if(isAll){
+      const mine=ME?mySeats(g,ME):0;
+      const max=Math.min(SEATS, mine+spareLeft(g));
+      const opts=Array.from({length:max+1},(_,k)=>
+        `<option value="${k}" ${k===mine?"selected":""}>${k===0?"can't go":k+" seat"+(k>1?"s":"")}</option>`).join("");
+      act=`<select class="myseats tiny" data-n="${g.n}">${opts}</select>`;
+    }
+    else {
       if(g.status==="offered") act=`<button class="ghost tiny" data-un="${g.n}">Cancel offer</button>`;
       else if(g.status==="spare") act=`<button class="ghost tiny" data-un="${g.n}">Cancel spare seats</button>`;
       else act=`<button class="ghost tiny" data-cant="${g.n}">Can't go at all</button>
@@ -533,7 +559,7 @@ function renderSchedule(){
           <option value="1">1 spare</option><option value="2">2 spare</option><option value="3">3 spare</option>
         </select>`;
     }
-    const who=isAll?"":`<div class="whoson">${attendLine(g)}</div>`;
+    const who=`<div class="whoson">${attendLine(g)}</div>`;
     const tr=document.createElement("tr");
     if(isAll) tr.className="shared";
     tr.innerHTML=`<td class="c-num" data-l="Game">${g.n}</td>
@@ -559,6 +585,19 @@ function renderSchedule(){
     await logActivity(`${ME} can't make #${g.n} ${g.opp} (${g.day} ${g.date}) — whole game up for grabs`);
     renderAll(); alert(`#${g.n} ${g.opp} is up for grabs. Give the others a nudge in the group chat too.`);
   }));
+  tb.querySelectorAll("select.myseats").forEach(s=>s.addEventListener("change",async e=>{
+    const g=games.find(x=>x.n==e.target.dataset.n);
+    if(!requireMe()){ renderAll(); return; }
+    const want=+e.target.value, had=mySeats(g,ME);
+    g.claims=(g.claims||[]).filter(c=>c.by!==ME);
+    if(want>0) g.claims.push({by:ME,seats:want});
+    await saveGame(g);
+    const msg = want===0
+      ? `${ME} can't make #${g.n} ${g.opp} (${g.day} ${g.date})${had>0?` — ${had} seat${had>1?"s":""} freed up`:""}`
+      : `${ME} is taking ${want} seat${want>1?"s":""} for the all-together night #${g.n} ${g.opp}`;
+    await logActivity(msg);
+    renderAll();
+  }));
   tb.querySelectorAll("select.sparesel").forEach(s=>s.addEventListener("change",async e=>{
     const n=+e.target.dataset.n, seats=+e.target.value;
     if(!seats){ return; }
@@ -582,12 +621,29 @@ function renderSchedule(){
 function renderAvailable(){
   const list=document.getElementById("availList"); list.innerHTML="";
   const whole=games.filter(g=>g.status==="offered"&&g.owner!==ALL);
-  const spare=games.filter(g=>g.status==="spare"&&spareLeft(g)>0);
-  const total=whole.length+spare.length;
+  const spare=games.filter(g=>g.owner!==ALL&&g.status==="spare"&&spareLeft(g)>0);
+  const sharedFree=games.filter(g=>g.owner===ALL&&g.drafted!==false&&spareLeft(g)>0);
+  const total=whole.length+spare.length+sharedFree.length;
   const b=document.getElementById("availBadge");
   b.textContent=total; b.classList.toggle("show",total>0);
 
-  if(!total) list.innerHTML=`<div class="empty">Nothing going spare. If you can't make one of yours — or have seats free — use the buttons on the Schedule tab.</div>`;
+  if(!total) list.innerHTML=`<div class="empty">Nothing going spare. If you can't make a game — or have seats free — use the controls on the Schedule tab.</div>`;
+
+  // all-together nights with seats still unclaimed
+  sharedFree.forEach(g=>{
+    const left=spareLeft(g);
+    const seatOpts=Array.from({length:left},(_,i)=>i+1)
+      .map(k=>`<option value="${k}" ${k===1?"selected":""}>${k} seat${k>1?"s":""}</option>`).join("");
+    list.insertAdjacentHTML("beforeend",
+      `<div class="ogame shared"><div class="g-meta">
+        <div class="g-opp">#${g.n} · ${g.opp} <span class="alltag">all together</span> <span class="sparepill">${left} seat${left>1?"s":""} free</span></div>
+        <div class="g-sub">${whenLine(g)} · nobody's night — grab what you need</div>
+        <div class="g-sub" style="margin-top:4px">${attendLine(g)}</div></div>
+        <div class="dpick">
+          <select class="seatsel" data-n="${g.n}">${seatOpts}</select>
+          ${FAMILIES.map(f=>`<button data-share="${g.n}" data-by="${f}">${f}</button>`).join("")}
+        </div></div>`);
+  });
 
   // whole games
   whole.forEach(g=>{
@@ -631,6 +687,22 @@ function renderAvailable(){
     await saveGame(g);
     if(by!==ALL) await recordMove(g.n,SEATS,prevOwner,by,"game");
     await logActivity(`#${g.n} ${g.opp}: whole game ${from} → ${by}`);
+    renderAll();
+  }));
+
+  // take seats on an all-together night (no owner, so no transfer logged)
+  list.querySelectorAll("[data-share]").forEach(btn=>btn.addEventListener("click",async e=>{
+    const n=+e.target.dataset.share, by=e.target.dataset.by;
+    const g=games.find(x=>x.n===n);
+    const sel=document.querySelector(`select.seatsel[data-n="${n}"]`);
+    const want=Math.min(+sel.value||1, spareLeft(g));
+    if(want<1) return;
+    if(!confirm(`${by} takes ${want} seat${want>1?"s":""} for the all-together night — #${n} ${g.opp} (${g.day} ${g.date}, ${g.time}).`)) return;
+    g.claims=g.claims||[];
+    const ex=g.claims.find(c=>c.by===by);
+    if(ex) ex.seats+=want; else g.claims.push({by,seats:want});
+    await saveGame(g);
+    await logActivity(`#${g.n} ${g.opp} (all together): ${by} took ${want} seat${want>1?"s":""}`);
     renderAll();
   }));
 
@@ -741,7 +813,7 @@ function renderFairness(){
   const sn=document.getElementById("sharedNote");
   sn.innerHTML=shared.length
     ? `<div class="sharedbox"><b>Everyone together:</b> ${shared.map(g=>`${g.opp}, ${g.day} ${g.date} ${g.time}`).join(" · ")}.
-       <div class="note" style="margin-top:5px">Doesn't count toward anyone's tally. With only four seats you'll likely want a couple of extra tickets for this one.</div></div>`
+       <div class="note" style="margin-top:5px">You each hold one seat on these nights, with a spare fourth going free. Give yours up on the Schedule tab if you can't make it.</div></div>`
     : "";
 }
 
@@ -752,32 +824,46 @@ function fillSelects(){
   document.getElementById("mTo").selectedIndex=1;
 }
 function seatBalance(){
-  const b={}; FAMILIES.forEach(f=>b[f]={given:0,got:0});
+  const b={}; FAMILIES.forEach(f=>b[f]={given:0,got:0,shared:0});
+  // seats swapped on games someone owns
   moves.forEach(m=>{
     const seats=m.seats||0;
     if(b[m.from]) b[m.from].given+=seats;
     if(b[m.to])   b[m.to].got+=seats;
   });
+  // all-together nights: you hold one seat, so anything either side of that counts
+  games.filter(g=>g.owner===ALL&&g.drafted!==false).forEach(g=>{
+    FAMILIES.forEach(f=>{ b[f].shared += mySeats(g,f)-SHARE_ON_SHARED; });
+  });
   return b;
 }
+const netOf=x=>x.got-x.given+x.shared;
 function renderBalance(){
   const b=seatBalance();
   const box=document.getElementById("balanceCards"); box.innerHTML=""; let sum=0, any=false;
   FAMILIES.forEach(f=>{
-    const net=b[f].got-b[f].given; sum+=net;
-    if(b[f].got||b[f].given) any=true;
+    const net=netOf(b[f]); sum+=net;
+    if(b[f].got||b[f].given||b[f].shared) any=true;
     const cls=net>0?"owes":net<0?"owed":"even";
     const verdict=net>0?`used ${net} extra seat${net>1?"s":""}`
       :net<0?`gave up ${-net} seat${net<-1?"s":""}`:"all square";
+    const bits=[`gave ${b[f].given}`,`took ${b[f].got}`];
+    if(b[f].shared!==0) bits.push(`shared ${b[f].shared>0?"+":"−"}${Math.abs(b[f].shared)}`);
     box.insertAdjacentHTML("beforeend",
       `<div class="scard"><div style="font-weight:800"><span class="dot" style="background:${HUE[f]}"></span>${f}</div>
         <div class="net ${cls}">${net>0?"+":net<0?"−":""}${Math.abs(net)}</div>
         <div style="font-size:.78rem;font-weight:700" class="${cls}">${verdict}</div>
-        <div class="note" style="margin-top:5px">gave ${b[f].given} · took ${b[f].got}</div></div>`);
+        <div class="note" style="margin-top:5px">${bits.join(" · ")}</div></div>`);
   });
+  // the spare 4th seat on each shared night is a genuine bonus, so the totals
+  // won't sum to zero if someone has taken one
+  const floaters=games.filter(g=>g.owner===ALL&&g.drafted!==false)
+    .reduce((s,g)=>s+(SEATS-SHARE_ON_SHARED*FAMILIES.length-spareLeft(g)),0);
   document.getElementById("balanceNote").textContent = !any
     ? "No seats have changed hands yet."
-    : (sum===0 ? "Balances out ✓ — every seat given was taken by someone." : "");
+    : sum===0 ? "Balances out ✓ — every seat given was taken by someone."
+    : floaters>0 ? `Totals come to +${sum} because ${floaters} spare seat${floaters>1?"s":""} on the all-together night${floaters>1?"s":""} went to someone. That's a bonus, not a debt.`
+    : "";
 }
 function renderMoves(){
   const tb=document.getElementById("moveBody"); tb.innerHTML="";
